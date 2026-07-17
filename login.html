@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manutenção — Login Administrativo</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:    #14100b;
+    --bg2:   #1d1710;
+    --card:  #1a1510;
+    --border: #3a2e1e;
+    --accent: #f59e0b;
+    --accent-glow: rgba(245,158,11,0.18);
+    --text:  #f0e6d8;
+    --text2: #b3a088;
+    --text3: #6b5940;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Space Grotesk', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(245,158,11,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(245,158,11,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
+  .orb { position: fixed; width: 500px; height: 500px; border-radius: 50%; pointer-events: none; }
+  .orb1 { top: -150px; left: -150px; background: radial-gradient(circle, rgba(245,158,11,0.07) 0%, transparent 70%); }
+  .orb2 { bottom: -150px; right: -150px; background: radial-gradient(circle, rgba(193,180,238,0.05) 0%, transparent 70%); }
+  .login-wrap { position: relative; z-index: 1; width: 100%; max-width: 420px; padding: 20px; animation: fadeIn 0.5s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--text3); font-size: 13px; text-decoration: none; margin-bottom: 28px; transition: color 0.2s; }
+  .back-link:hover { color: var(--text2); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 40px 36px; position: relative; overflow: hidden; }
+  .card::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 60%; height: 1px; background: linear-gradient(90deg, transparent, rgba(245,158,11,0.4), transparent); }
+  .card-icon { width: 52px; height: 52px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 22px; }
+  h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: var(--text2); margin-bottom: 32px; }
+  .field { margin-bottom: 16px; }
+  label { display: block; font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
+  input { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 9px; padding: 13px 14px; font-family: var(--sans); font-size: 16px; color: var(--text); outline: none; transition: all 0.2s; }
+  input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+  input::placeholder { color: var(--text3); }
+  .error-msg { display: none; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #f87171; margin-bottom: 16px; align-items: center; gap: 8px; }
+  .error-msg.show { display: flex; }
+  .btn-login { width: 100%; padding: 14px; background: var(--accent); border: none; border-radius: 10px; font-family: var(--sans); font-size: 15px; font-weight: 600; color: #14100b; cursor: pointer; transition: all 0.2s; margin-top: 8px; }
+  .btn-login:hover { background: #fbbf24; box-shadow: 0 6px 20px rgba(245,158,11,0.25); transform: translateY(-1px); }
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="login-wrap">
+  <a href="index.html" class="back-link">← Voltar ao formulário</a>
+  <div class="card">
+    <div class="card-icon">🔧</div>
+    <h1>Painel de Manutenção</h1>
+    <p class="subtitle">Digite a senha de acesso do setor.</p>
+    <div class="error-msg" id="errorMsg">⚠️ Senha incorreta.</div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn-login" onclick="login()">Entrar no painel</button>
+  </div>
+</div>
+<script>
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+  const SENHA = 'Manutencao@2026';
+  function login() {
+    const s = document.getElementById('senha').value;
+    const err = document.getElementById('errorMsg');
+    if (s === SENHA) {
+      sessionStorage.setItem('manut_logged', '1');
+      window.location.href = 'admin.html';
+    } else {
+      err.classList.add('show');
+      setTimeout(() => err.classList.remove('show'), 3000);
+    }
+  }
+</script>
+</body>
+</html>

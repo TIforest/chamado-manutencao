@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manutenção — Painel Administrativo</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:    #14100b;
+    --bg2:   #1d1710;
+    --bg3:   #251d14;
+    --card:  #1a1510;
+    --card2: #241c14;
+    --border:  #3a2e1e;
+    --border2: #4a3a26;
+    --accent:      #f59e0b;
+    --accent-glow: rgba(245,158,11,0.18);
+    --green:  #4ade80;
+    --yellow: #f59e0b;
+    --red:    #ef4444;
+    --text:  #f0e6d8;
+    --text2: #b3a088;
+    --text3: #6b5940;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Space Grotesk', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(245,158,11,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(245,158,11,0.02) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+
+  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 220px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 50; }
+  .sidebar-header { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
+  .logo { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
+  .logo-icon { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .logo-sub { font-size: 11px; color: var(--text3); font-weight: 400; margin-top: 1px; }
+  .nav { flex: 1; padding: 12px 10px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; transition: all 0.15s; margin-bottom: 2px; }
+  .nav-item:hover { background: var(--border); color: var(--text); }
+  .nav-item.active { background: rgba(245,158,11,0.08); color: var(--accent); }
+  .nav-item .icon { font-size: 15px; width: 20px; text-align: center; }
+  .nav-badge { margin-left: auto; background: var(--accent); color: #14100b; font-size: 10px; font-family: var(--mono); font-weight: 700; padding: 2px 6px; border-radius: 10px; min-width: 18px; text-align: center; display: none; }
+  .nav-badge.show { display: block; }
+  .nav-badge.yellow { background: var(--yellow); color: #000; }
+  .sidebar-footer { padding: 12px 10px; border-top: 1px solid var(--border); }
+  .nav-item { }
+
+  .main { margin-left: 220px; min-height: 100vh; position: relative; z-index: 1; }
+  .topbar { height: 58px; background: rgba(20,16,11,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 40; }
+  .page-title { font-size: 16px; font-weight: 600; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .badge-count { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); font-family: var(--mono); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.open { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 2s infinite; }
+  .dot.active { background: var(--yellow); }
+  .dot.done { background: var(--green); }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+  .content { padding: 28px; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+  .stat-label { font-size: 11px; font-family: var(--mono); color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+  .stat-val { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+  .stat-val.blue { color: var(--accent); } .stat-val.yellow { color: var(--yellow); } .stat-val.green { color: var(--green); } .stat-val.all { color: var(--text); }
+
+  .panel { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; display: none; }
+  .panel.active { display: block; }
+  .panel-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .panel-title { font-size: 14px; font-weight: 600; }
+  .filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .filter-input, .filter-select { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; font-family: var(--sans); font-size: 12px; color: var(--text); outline: none; transition: border-color 0.2s; appearance: none; -webkit-appearance: none; }
+  .filter-input { min-width: 180px; }
+  .filter-select { cursor: pointer; padding-right: 28px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23b3a088' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+  .filter-input:focus, .filter-select:focus { border-color: var(--accent); }
+  .filter-input::placeholder { color: var(--text3); }
+  .btn-export { display: flex; align-items: center; gap: 7px; padding: 7px 14px; background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.18); border-radius: 8px; font-family: var(--sans); font-size: 12px; font-weight: 500; color: var(--green); cursor: pointer; transition: all 0.2s; }
+  .btn-export:hover { background: rgba(74,222,128,0.15); }
+  .btn-refresh { display: flex; align-items: center; gap: 7px; padding: 7px 14px; background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.15); border-radius: 8px; font-family: var(--sans); font-size: 12px; font-weight: 500; color: var(--accent); cursor: pointer; transition: all 0.2s; }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: var(--bg2); padding: 10px 14px; text-align: left; font-size: 11px; font-family: var(--mono); color: var(--text3); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 11px 14px; border-bottom: 1px solid rgba(58,46,30,0.6); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(245,158,11,0.02); }
+  .td-id { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+  .td-name { font-weight: 500; } .td-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .badge.aberto    { background: rgba(245,158,11,0.1);  color: #f59e0b; border: 1px solid rgba(245,158,11,0.2); }
+  .badge.andamento { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
+  .badge.finalizado{ background: rgba(74,222,128,0.1);  color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
+  .badge.p1 { background: rgba(74,222,128,0.1);  color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
+  .badge.p2 { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
+  .badge.p3 { background: rgba(239,68,68,0.12);  color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+
+  .actions { display: flex; gap: 6px; align-items: center; }
+  .btn-action { padding: 5px 10px; border-radius: 6px; border: 1px solid; font-family: var(--sans); font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .btn-iniciar  { background: rgba(245,158,11,0.1);  border-color: rgba(245,158,11,0.25);  color: #fbbf24; }
+  .btn-iniciar:hover  { background: rgba(245,158,11,0.2); }
+  .btn-finalizar{ background: rgba(74,222,128,0.1);  border-color: rgba(74,222,128,0.25);  color: #4ade80; }
+  .btn-finalizar:hover{ background: rgba(74,222,128,0.2); }
+  .btn-ver      { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.2);   color: var(--accent); }
+  .btn-ver:hover      { background: rgba(245,158,11,0.15); }
+  .btn-del      { background: rgba(239,68,68,0.08);  border-color: rgba(239,68,68,0.2);    color: #f87171; }
+  .btn-del:hover      { background: rgba(239,68,68,0.16); }
+
+  .empty-state { padding: 50px; text-align: center; color: var(--text3); font-size: 14px; }
+  .empty-state .icon { font-size: 36px; margin-bottom: 12px; }
+  .loading-state { padding: 40px; text-align: center; color: var(--text3); font-size: 13px; font-family: var(--mono); }
+
+  .month-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+  .btn-month { padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); font-family: var(--sans); font-size: 12px; font-weight: 500; color: var(--text2); cursor: pointer; transition: all 0.15s; }
+  .btn-month:hover { border-color: var(--border2); color: var(--text); }
+  .btn-month.active { background: rgba(245,158,11,0.15); border-color: #f59e0b; color: #f59e0b; font-weight: 700; box-shadow: 0 0 8px rgba(245,158,11,0.2); }
+  .btn-download-month { display: flex; align-items: center; gap: 7px; padding: 7px 14px; background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); border-radius: 8px; font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--green); cursor: pointer; transition: all 0.15s; }
+  .btn-download-month:hover { background: rgba(74,222,128,0.2); border-color: rgba(74,222,128,0.5); }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--card); border: 1px solid var(--border2); border-radius: 16px; padding: 28px; width: 100%; max-width: 500px; animation: modalIn 0.25s ease; max-height: 90vh; overflow-y: auto; }
+  @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
+  .modal label { display: block; font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
+  .modal select, .modal input { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 9px; padding: 11px 14px; font-family: var(--sans); font-size: 14px; color: var(--text); outline: none; transition: border-color 0.2s; margin-bottom: 16px; appearance: none; -webkit-appearance: none; }
+  .modal select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23b3a088' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+  .modal select:focus, .modal input:focus { border-color: var(--accent); }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .btn-cancel  { padding: 9px 18px; border-radius: 8px; border: 1px solid var(--border); background: transparent; font-family: var(--sans); font-size: 13px; color: var(--text2); cursor: pointer; }
+  .btn-confirm { padding: 9px 18px; border-radius: 8px; border: none; background: var(--green); font-family: var(--sans); font-size: 13px; font-weight: 600; color: #14100b; cursor: pointer; }
+  .btn-confirm:hover { background: #22c55e; }
+  .btn-confirm:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--green); border-radius: 10px; padding: 13px 18px; font-size: 13px; color: var(--green); z-index: 999; transform: translateX(120%); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .toast.show  { transform: translateX(0); }
+  .toast.error { border-color: var(--red); color: #f87171; }
+
+  @media (max-width: 900px) { .sidebar { display: none; } .main { margin-left: 0; } .stats-row { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-icon">🔧</div>
+      <div><div>Manutenção</div><div class="logo-sub">Painel Admin</div></div>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="nav-item active" onclick="showPanel('tickets')" id="nav-tickets">
+      <span class="icon">📋</span> Chamados
+      <span class="nav-badge" id="badge-tickets"></span>
+    </div>
+    <div class="nav-item" onclick="showPanel('andamento')" id="nav-andamento">
+      <span class="icon">⚡</span> Em Andamento
+      <span class="nav-badge yellow" id="badge-andamento"></span>
+    </div>
+    <div class="nav-item" onclick="showPanel('historico')" id="nav-historico">
+      <span class="icon">📚</span> Histórico
+    </div>
+    <div class="nav-item" onclick="showPanel('meses')" id="nav-meses">
+      <span class="icon">📁</span> Meses
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="nav-item" onclick="logout()"><span class="icon">🚪</span> Sair</div>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <div class="page-title" id="pageTitle">Chamados Novos</div>
+    <div class="topbar-right">
+      <div class="badge-count"><div class="dot open"></div><span id="countAberto">0</span> abertos</div>
+      <div class="badge-count"><div class="dot active"></div><span id="countAndamento">0</span> em andamento</div>
+      <div class="badge-count"><div class="dot done"></div><span id="countFinalizado">0</span> finalizados</div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Total</div><div class="stat-val all" id="statTotal">—</div></div>
+      <div class="stat-card"><div class="stat-label">Abertos</div><div class="stat-val blue" id="statAberto">—</div></div>
+      <div class="stat-card"><div class="stat-label">Em Andamento</div><div class="stat-val yellow" id="statAndamento">—</div></div>
+      <div class="stat-card"><div class="stat-label">Finalizados</div><div class="stat-val green" id="statFinalizado">—</div></div>
+    </div>
+
+    <div class="panel active" id="panel-tickets">
+      <div class="panel-header">
+        <div class="panel-title">📋 Chamados Novos — Aguardando Atendimento</div>
+        <div class="filters">
+          <input class="filter-input" type="text" id="searchInput" placeholder="🔍 Buscar..." oninput="renderTickets()">
+          <select class="filter-select" id="filterSetor" onchange="renderTickets()">
+            <option value="">Todos os setores</option>
+            <option>CORTE</option><option>REBOBINAGEM</option><option>EMBALAGEM AUTOMÁTICA</option><option>EMBALAGEM MANUAL</option><option>COLAGEM</option><option>PRENSAGEM</option><option>MANUTENÇÃO</option><option>ALMOXARIFADO</option><option>EMPILHADEIRAS</option><option>ÁREAS GERAIS</option>
+          </select>
+          <button class="btn-refresh" onclick="loadAll()">🔄 Atualizar</button>
+        </div>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>ID</th><th>Líder / Setor</th><th>Máquina</th><th>Problema</th><th>Prioridade</th><th>Aguardando há</th><th>Ações</th></tr></thead><tbody id="ticketsTable"><tr><td colspan="7"><div class="loading-state">⏳ Conectando ao banco de dados...</div></td></tr></tbody></table></div>
+    </div>
+
+    <div class="panel" id="panel-andamento">
+      <div class="panel-header">
+        <div class="panel-title">⚡ Chamados Em Andamento</div>
+        <div class="filters">
+          <input class="filter-input" type="text" id="searchAnd" placeholder="🔍 Buscar..." oninput="renderAndamento()">
+          <select class="filter-select" id="filterMesAnd" onchange="renderAndamento()"><option value="">Todos os meses</option></select>
+          <button class="btn-refresh" onclick="loadAll()">🔄 Atualizar</button>
+        </div>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>ID</th><th>Líder / Setor</th><th>Máquina</th><th>Prioridade</th><th>T. espera</th><th>T. andamento</th><th>Técnico</th><th>Ações</th></tr></thead><tbody id="andamentoTable"></tbody></table></div>
+    </div>
+
+    <div class="panel" id="panel-historico">
+      <div class="panel-header">
+        <div class="panel-title">📚 Histórico de Chamados Finalizados</div>
+        <div class="filters">
+          <input class="filter-input" type="text" id="searchHist" placeholder="🔍 Buscar..." oninput="renderHistory()">
+          <select class="filter-select" id="filterMesHist" onchange="renderHistory()"><option value="">Todos os meses</option></select>
+          <button class="btn-export" onclick="exportCSV()">⬇️ Exportar CSV</button>
+          <button class="btn-refresh" onclick="loadAll()">🔄 Atualizar</button>
+        </div>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>ID</th><th>Líder / Setor</th><th>Máquina</th><th>Prioridade</th><th>Técnico</th><th>Data Fim</th><th>T. espera</th><th>T. andamento</th><th>Mês</th><th></th></tr></thead><tbody id="histTable"></tbody></table></div>
+    </div>
+
+    <div class="panel" id="panel-meses">
+      <div class="panel-header"><div class="panel-title">📁 Controle por Mês</div></div>
+      <div style="padding:22px"><div class="month-controls" id="monthControls"></div><div id="monthStats" style="margin-top:16px"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalIniciar">
+  <div class="modal">
+    <div class="modal-title">▶ Iniciar Chamado</div>
+    <div class="modal-sub" id="modalIniciarSub"></div>
+    <label>Técnico que vai iniciar</label>
+    <select id="tecnicoIniciarSel">
+      <option value="">Selecione...</option>
+      <option>AMARILDO SILVA</option><option>CLEYTON MOREIRA</option><option>VITTOR LODONHO</option>
+      <option>VINICIUS SANTOS</option><option>EVERSON SANTOS</option><option>ALESSANDRO RODRIGUES</option>
+      <option>MATHEUS OLIVEIRA</option><option>JOSUEL OLIVEIRA</option><option>PAULO HENRIQUE</option>
+      <option>MARCIO ALMEIDA</option><option value="Outro">Outro (digitar nome)</option>
+    </select>
+    <input type="text" id="tecnicoIniciarOutro" placeholder="Digite o nome do técnico" style="display:none">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modalIniciar')">Cancelar</button>
+      <button class="btn-confirm" id="btnConfirmarIniciar" onclick="confirmarIniciar()">Iniciar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalFinalizar">
+  <div class="modal">
+    <div class="modal-title">✅ Finalizar Chamado</div>
+    <div class="modal-sub" id="modalFinalizarSub"></div>
+    <label>Técnico que finalizou</label>
+    <select id="tecnicoFinalizarSel">
+      <option value="">Selecione...</option>
+      <option>AMARILDO SILVA</option><option>CLEYTON MOREIRA</option><option>VITTOR LODONHO</option>
+      <option>VINICIUS SANTOS</option><option>EVERSON SANTOS</option><option>ALESSANDRO RODRIGUES</option>
+      <option>MATHEUS OLIVEIRA</option><option>JOSUEL OLIVEIRA</option><option>PAULO HENRIQUE</option>
+      <option>MARCIO ALMEIDA</option><option value="Outro">Outro (digitar nome)</option>
+    </select>
+    <input type="text" id="tecnicoFinalizarOutro" placeholder="Digite o nome do técnico" style="display:none">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modalFinalizar')">Cancelar</button>
+      <button class="btn-confirm" id="btnConfirmarFinalizar" onclick="confirmarFinalizar()">Finalizar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalDetalhes">
+  <div class="modal">
+    <div class="modal-title" id="detTitle"></div>
+    <div id="detBody" style="margin:14px 0"></div>
+    <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('modalDetalhes')">Fechar</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+if (!sessionStorage.getItem('manut_logged')) window.location.href = 'login.html';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCPiAWJ5q8FqVTqJ8NUgyFYqUtktqMmt94",
+  authDomain: "chamado-manutencao.firebaseapp.com",
+  projectId: "chamado-manutencao",
+  storageBucket: "chamado-manutencao.firebasestorage.app",
+  messagingSenderId: "329198000958",
+  appId: "1:329198000958:web:05c31243c0ecb11c25ea6f"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+let allTickets = [];
+let iniciandoId = null;
+let finalizingId = null;
+let mesesActiveMonth = null;
+
+function loadAll() {
+  const q = query(collection(db, 'chamados'), orderBy('createdAt', 'asc'));
+  onSnapshot(q, (snap) => {
+    allTickets = snap.docs.map(d => ({ _docId: d.id, ...d.data() }));
+    updateStats(); renderTickets();
+    if (document.getElementById('panel-andamento').classList.contains('active')) renderAndamento();
+    if (document.getElementById('panel-historico').classList.contains('active')) renderHistory();
+    if (document.getElementById('panel-meses').classList.contains('active'))    renderMonths();
+    populateMonthSelect();
+  }, err => {
+    console.error('Firebase error:', err);
+    document.getElementById('ticketsTable').innerHTML =
+      `<tr><td colspan="7"><div class="loading-state" style="color:#f87171">❌ Erro ao conectar. ${err.message}</div></td></tr>`;
+  });
+}
+window.loadAll = loadAll;
+
+function fmt(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+}
+function calcTempo(iso1, iso2) {
+  if (!iso1) return '—';
+  const ms = (iso2 ? new Date(iso2) : new Date()) - new Date(iso1);
+  if (ms < 0) return '—';
+  const mins = Math.floor(ms / 60000);
+  const h = Math.floor(mins / 60);
+  const d = Math.floor(h / 24);
+  if (d > 0) return `${d}d ${h % 24}h`;
+  if (h > 0) return `${h}h ${mins % 60}min`;
+  return `${mins}min`;
+}
+function statusClass(s) {
+  if (s==='Aberto') return 'aberto';
+  if (s==='Em andamento') return 'andamento';
+  return 'finalizado';
+}
+function prioLabel(p) {
+  if (p===1) return '🟢 Funcionando';
+  if (p===2) return '🟡 Crítico';
+  if (p===3) return '🔴 Urgente';
+  return '—';
+}
+function getCurrentMonth() {
+  const now = new Date();
+  return `${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
+}
+function getMonths() {
+  const set = new Set(allTickets.map(t=>t.mes).filter(Boolean));
+  set.add(getCurrentMonth());
+  return [...set].sort();
+}
+
+function updateStats() {
+  const a = allTickets.filter(x=>x.status==='Aberto').length;
+  const e = allTickets.filter(x=>x.status==='Em andamento').length;
+  const f = allTickets.filter(x=>x.status==='Finalizado').length;
+  document.getElementById('statTotal').textContent=allTickets.length;
+  document.getElementById('statAberto').textContent=a;
+  document.getElementById('statAndamento').textContent=e;
+  document.getElementById('statFinalizado').textContent=f;
+  document.getElementById('countAberto').textContent=a;
+  document.getElementById('countAndamento').textContent=e;
+  document.getElementById('countFinalizado').textContent=f;
+  const bT=document.getElementById('badge-tickets');
+  const bA=document.getElementById('badge-andamento');
+  bT.textContent=a; bT.classList.toggle('show',a>0);
+  bA.textContent=e; bA.classList.toggle('show',e>0);
+}
+
+function getMonthFromISO(iso) {
+  if (!iso) return null;
+  const d = new Date(iso);
+  return `${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
+
+function populateMonthSelect() {
+  const sel=document.getElementById('filterMesHist'); const val=sel.value;
+  sel.innerHTML='<option value="">Todos os meses</option>';
+  getMonths().forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;sel.appendChild(o);});
+  if(val) sel.value=val;
+
+  const selAnd=document.getElementById('filterMesAnd'); const valAnd=selAnd.value;
+  const andMonths=[...new Set(allTickets.filter(x=>x.status==='Em andamento').map(x=>getMonthFromISO(x.dataInicio||x.dataCriacao)).filter(Boolean))].sort();
+  selAnd.innerHTML='<option value="">Todos os meses</option>';
+  andMonths.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;selAnd.appendChild(o);});
+  if(valAnd) selAnd.value=valAnd;
+}
+
+function renderTickets() {
+  const search=document.getElementById('searchInput').value.toLowerCase();
+  const setor=document.getElementById('filterSetor').value;
+  let t=allTickets.filter(x=>x.status==='Aberto');
+  if(search) t=t.filter(x=>x.lider?.toLowerCase().includes(search)||x.maquina?.toLowerCase().includes(search)||x.id?.toLowerCase().includes(search));
+  if(setor)  t=t.filter(x=>x.setor===setor);
+  const tbody=document.getElementById('ticketsTable');
+  if(!t.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="icon">✅</div>Nenhum chamado novo aguardando</div></td></tr>`;return;}
+  tbody.innerHTML=t.map(x=>`<tr>
+    <td class="td-id">${x.id}</td>
+    <td><div class="td-name">${x.lider}</div><div class="td-sub">${x.setor}</div></td>
+    <td><span style="font-size:12px">${x.maquina}</span></td>
+    <td><span style="font-size:11px;color:var(--text2)">${x.tipoProblema}</span><div class="td-sub" style="max-width:200px">${x.observacao||''}</div></td>
+    <td><span class="badge p${x.prioridade}">${prioLabel(x.prioridade)}</span></td>
+    <td style="font-size:12px;color:var(--yellow);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataCriacao, null)}</td>
+    <td><div class="actions">
+      <button class="btn-action btn-iniciar" onclick="abrirIniciar('${x._docId}','${x.id}','${(x.lider||'').replace(/'/g,"\\'")}','${x.maquina}')">▶ Iniciar</button>
+      <button class="btn-action btn-ver"     onclick="verDetalhes('${x._docId}')">👁</button>
+      <button class="btn-action btn-del"     onclick="deletarTicket('${x._docId}','${x.id}')">✕</button>
+    </div></td></tr>`).join('');
+}
+window.renderTickets=renderTickets;
+
+function renderAndamento() {
+  const search=document.getElementById('searchAnd').value.toLowerCase();
+  const mes=document.getElementById('filterMesAnd').value;
+  let t=allTickets.filter(x=>x.status==='Em andamento');
+  if(search) t=t.filter(x=>x.lider?.toLowerCase().includes(search)||x.maquina?.toLowerCase().includes(search)||x.id?.toLowerCase().includes(search));
+  if(mes) t=t.filter(x=>getMonthFromISO(x.dataInicio||x.dataCriacao)===mes);
+  const tbody=document.getElementById('andamentoTable');
+  if(!t.length){tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="icon">📭</div>Nenhum chamado em andamento</div></td></tr>`;return;}
+  tbody.innerHTML=t.map(x=>`<tr>
+    <td class="td-id">${x.id}</td>
+    <td><div class="td-name">${x.lider}</div><div class="td-sub">${x.setor}</div></td>
+    <td><span style="font-size:12px">${x.maquina}</span></td>
+    <td><span class="badge p${x.prioridade}">${prioLabel(x.prioridade)}</span></td>
+    <td style="font-size:12px;color:var(--yellow);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataCriacao, x.dataInicio)}</td>
+    <td style="font-size:12px;color:var(--accent);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataInicio, null)}</td>
+    <td><span style="font-size:12px;color:var(--yellow);font-family:var(--mono)">${x.tecnicoInicio||'—'}</span></td>
+    <td><div class="actions">
+      <button class="btn-action btn-finalizar" onclick="abrirFinalizar('${x._docId}','${x.id}','${(x.lider||'').replace(/'/g,"\\'")}','${x.tecnicoInicio||''}')">✓ Finalizar</button>
+      <button class="btn-action btn-ver"       onclick="verDetalhes('${x._docId}')">👁</button>
+      <button class="btn-action btn-del"       onclick="deletarTicket('${x._docId}','${x.id}')">✕</button>
+    </div></td></tr>`).join('');
+}
+window.renderAndamento=renderAndamento;
+
+function renderHistory() {
+  const search=document.getElementById('searchHist').value.toLowerCase();
+  const mes=document.getElementById('filterMesHist').value;
+  let t=allTickets.filter(x=>x.status==='Finalizado');
+  if(search) t=t.filter(x=>x.lider?.toLowerCase().includes(search)||x.maquina?.toLowerCase().includes(search)||x.id?.toLowerCase().includes(search));
+  if(mes)    t=t.filter(x=>x.mes===mes);
+  const tbody=document.getElementById('histTable');
+  if(!t.length){tbody.innerHTML=`<tr><td colspan="10"><div class="empty-state"><div class="icon">📭</div>Nenhum chamado finalizado</div></td></tr>`;return;}
+  tbody.innerHTML=t.map(x=>`<tr>
+    <td class="td-id">${x.id}</td>
+    <td><div class="td-name">${x.lider}</div><div class="td-sub">${x.setor}</div></td>
+    <td><span style="font-size:12px">${x.maquina}</span></td>
+    <td><span class="badge p${x.prioridade}">${prioLabel(x.prioridade)}</span></td>
+    <td><span style="font-size:12px;color:var(--green);font-family:var(--mono)">${x.tecnicoFim||'—'}</span></td>
+    <td style="font-size:11px;color:var(--text3);font-family:var(--mono);white-space:nowrap">${fmt(x.dataFim)}</td>
+    <td style="font-size:12px;color:var(--yellow);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataCriacao, x.dataInicio)}</td>
+    <td style="font-size:12px;color:var(--accent);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataInicio, x.dataFim)}</td>
+    <td><span style="font-family:var(--mono);font-size:11px;color:var(--accent)">${x.mes}</span></td>
+    <td><button class="btn-action btn-ver" onclick="verDetalhes('${x._docId}')" title="Ver chamado original">👁</button></td>
+  </tr>`).join('');
+}
+window.renderHistory=renderHistory;
+
+function renderMonths() {
+  const months=getMonths(); const cur=getCurrentMonth();
+  if(!mesesActiveMonth || !months.includes(mesesActiveMonth)) mesesActiveMonth=cur;
+  const active=mesesActiveMonth;
+  document.getElementById('monthControls').innerHTML=
+    months.map(m=>`<button class="btn-month ${m===active?'active':''}" onclick="selectMesAtivo('${m}')">${m}</button>`).join('')+
+    `<button class="btn-download-month" onclick="downloadMesCSV()">⬇️ Baixar ${active}</button>`;
+  const t=allTickets.filter(x=>x.mes===active);
+  document.getElementById('monthStats').innerHTML=`
+    <div style="font-size:13px;color:var(--text2);margin-bottom:10px;font-family:var(--mono)">Mês selecionado: <span style="color:var(--accent)">${active}</span></div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div class="stat-card" style="min-width:120px"><div class="stat-label">Chamados</div><div class="stat-val all">${t.length}</div></div>
+      <div class="stat-card" style="min-width:120px"><div class="stat-label">Finalizados</div><div class="stat-val green">${t.filter(x=>x.status==='Finalizado').length}</div></div>
+      <div class="stat-card" style="min-width:120px"><div class="stat-label">Pendentes</div><div class="stat-val blue">${t.filter(x=>x.status!=='Finalizado').length}</div></div>
+    </div>`;
+}
+window.renderMonths=renderMonths;
+function selectMesAtivo(m){mesesActiveMonth=m;renderMonths();}
+window.selectMesAtivo=selectMesAtivo;
+
+function csvRows(t) {
+  const header=['ID','Lider','Setor','Maquina','Tipo Problema','Observacao','Prioridade','Tecnico Inicio','Tecnico Fim','Data Abertura','Data Inicio','Data Fim','T. Espera','T. Andamento','Mes'];
+  const rows=t.map(x=>[x.id,x.lider,x.setor,x.maquina,x.tipoProblema,'"'+(x.observacao||'').replace(/"/g,'""')+'"',x.prioridade,x.tecnicoInicio||'—',x.tecnicoFim||'—',fmt(x.dataCriacao),fmt(x.dataInicio),fmt(x.dataFim),calcTempo(x.dataCriacao,x.dataInicio),calcTempo(x.dataInicio,x.dataFim),x.mes]);
+  return [header,...rows].map(r=>r.join(';')).join('\n');
+}
+
+function downloadMesCSV(){
+  const mes=mesesActiveMonth||getCurrentMonth();
+  const t=allTickets.filter(x=>x.mes===mes);
+  if(!t.length){alert('Nenhum chamado para exportar em '+mes+'.');return;}
+  const csv=csvRows(t);
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`chamados_manutencao_${mes.replace('/','_')}.csv`;a.click();
+  showToast('📥 Exportação de '+mes+' concluída!');
+}
+window.downloadMesCSV=downloadMesCSV;
+
+async function abrirIniciar(docId,id,lider,maquina){
+  iniciandoId=docId;
+  document.getElementById('modalIniciarSub').textContent=`${id} — ${lider} | ${maquina}`;
+  document.getElementById('tecnicoIniciarSel').value='';
+  document.getElementById('tecnicoIniciarOutro').style.display='none';
+  document.getElementById('tecnicoIniciarOutro').value='';
+  document.getElementById('btnConfirmarIniciar').disabled=false;
+  document.getElementById('btnConfirmarIniciar').textContent='Iniciar';
+  document.getElementById('modalIniciar').classList.add('open');
+}
+window.abrirIniciar=abrirIniciar;
+
+document.getElementById('tecnicoIniciarSel').addEventListener('change', function(){
+  document.getElementById('tecnicoIniciarOutro').style.display = this.value==='Outro' ? 'block' : 'none';
+});
+document.getElementById('tecnicoFinalizarSel').addEventListener('change', function(){
+  document.getElementById('tecnicoFinalizarOutro').style.display = this.value==='Outro' ? 'block' : 'none';
+});
+
+async function confirmarIniciar(){
+  const sel=document.getElementById('tecnicoIniciarSel').value;
+  const tecnico = sel==='Outro' ? document.getElementById('tecnicoIniciarOutro').value.trim() : sel;
+  if(!tecnico){alert('Selecione ou digite o nome do técnico.');return;}
+  const btn=document.getElementById('btnConfirmarIniciar');
+  btn.disabled=true; btn.textContent='Salvando...';
+  try {
+    await updateDoc(doc(db,'chamados',iniciandoId),{status:'Em andamento',dataInicio:new Date().toISOString(),tecnicoInicio:tecnico});
+    closeModal('modalIniciar');
+    showToast('▶ Chamado iniciado por '+tecnico+'!');
+  } catch(e){
+    showToast('❌ Erro ao iniciar.','error');
+    btn.disabled=false; btn.textContent='Iniciar';
+  }
+}
+window.confirmarIniciar=confirmarIniciar;
+
+function abrirFinalizar(docId,id,lider,tecnicoInicio){
+  finalizingId=docId;
+  document.getElementById('modalFinalizarSub').textContent=`${id} — ${lider}`;
+  const sel=document.getElementById('tecnicoFinalizarSel');
+  sel.value = [...sel.options].some(o=>o.value===tecnicoInicio) ? tecnicoInicio : '';
+  document.getElementById('tecnicoFinalizarOutro').style.display='none';
+  document.getElementById('tecnicoFinalizarOutro').value='';
+  document.getElementById('btnConfirmarFinalizar').disabled=false;
+  document.getElementById('btnConfirmarFinalizar').textContent='Finalizar';
+  document.getElementById('modalFinalizar').classList.add('open');
+}
+window.abrirFinalizar=abrirFinalizar;
+
+async function confirmarFinalizar(){
+  const sel=document.getElementById('tecnicoFinalizarSel').value;
+  const tecnico = sel==='Outro' ? document.getElementById('tecnicoFinalizarOutro').value.trim() : sel;
+  if(!tecnico){alert('Selecione ou digite o nome do técnico.');return;}
+  const btn=document.getElementById('btnConfirmarFinalizar');
+  btn.disabled=true; btn.textContent='Salvando...';
+  try {
+    await updateDoc(doc(db,'chamados',finalizingId),{status:'Finalizado',dataFim:new Date().toISOString(),tecnicoFim:tecnico});
+    closeModal('modalFinalizar');
+    showToast('✅ Chamado finalizado por '+tecnico+'!');
+  } catch(e){
+    showToast('❌ Erro ao finalizar.','error');
+    btn.disabled=false; btn.textContent='Finalizar';
+  }
+}
+window.confirmarFinalizar=confirmarFinalizar;
+
+async function deletarTicket(docId,id){
+  if(!confirm('Excluir o chamado '+id+'?')) return;
+  try{await deleteDoc(doc(db,'chamados',docId));showToast('Chamado '+id+' removido.');}
+  catch(e){showToast('Erro ao remover.','error');}
+}
+window.deletarTicket=deletarTicket;
+
+function verDetalhes(docId){
+  const t=allTickets.find(x=>x._docId===docId);
+  if(!t) return;
+  document.getElementById('detTitle').innerHTML=`
+    <span style="font-family:var(--mono);font-size:13px;color:var(--accent)">${t.id}</span>
+    <span class="badge ${statusClass(t.status)}" style="font-size:11px">${t.status}</span>
+    <span class="badge p${t.prioridade}" style="font-size:11px">${prioLabel(t.prioridade)}</span>`;
+  document.getElementById('detBody').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px">
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:.08em;margin-bottom:4px">LÍDER</div>
+        <div style="font-weight:600;font-size:14px">${t.lider}</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">${t.setor}</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px">
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:.08em;margin-bottom:4px">MÁQUINA / ÁREA</div>
+        <div style="font-size:13px;color:var(--text)">${t.maquina}</div>
+      </div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px">
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:.08em;margin-bottom:6px">TIPO DE PROBLEMA</div>
+      <span style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.18);color:var(--accent);border-radius:6px;padding:3px 10px;font-size:12px;font-weight:600">${t.tipoProblema}</span>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px">
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:.08em;margin-bottom:8px">📝 OBSERVAÇÃO</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap">${t.observacao}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px">
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">ABERTO EM</div>
+        <div style="font-size:11px;font-family:var(--mono);color:var(--text2)">${fmt(t.dataCriacao)}</div>
+      </div>
+      ${t.dataInicio?`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px">
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">INICIADO</div>
+        <div style="font-size:11px;font-family:var(--mono);color:var(--yellow)">${fmt(t.dataInicio)}${t.tecnicoInicio?' · '+t.tecnicoInicio:''}</div>
+      </div>`:''}
+      ${t.dataFim?`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px">
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">FINALIZADO</div>
+        <div style="font-size:11px;font-family:var(--mono);color:var(--green)">${fmt(t.dataFim)}${t.tecnicoFim?' · '+t.tecnicoFim:''}</div>
+      </div>`:''}
+    </div>`;
+  document.getElementById('modalDetalhes').classList.add('open');
+}
+window.verDetalhes=verDetalhes;
+
+function exportCSV(){
+  const mes=document.getElementById('filterMesHist').value;
+  let t=allTickets.filter(x=>x.status==='Finalizado');
+  if(mes) t=t.filter(x=>x.mes===mes);
+  if(!t.length){alert('Nenhum chamado para exportar.');return;}
+  const csv=csvRows(t);
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`chamados_manutencao_${mes?mes.replace('/','_'):'todos'}.csv`;a.click();
+  showToast('Exportação concluída!');
+}
+window.exportCSV=exportCSV;
+
+function showPanel(name){
+  ['tickets','andamento','historico','meses'].forEach(p=>{
+    document.getElementById('panel-'+p).classList.toggle('active',p===name);
+    document.getElementById('nav-'+p).classList.toggle('active',p===name);
+  });
+  const titles={tickets:'Chamados Novos',andamento:'Em Andamento',historico:'Histórico',meses:'Controle por Mês'};
+  document.getElementById('pageTitle').textContent=titles[name];
+  if(name==='historico') renderHistory();
+  if(name==='andamento') renderAndamento();
+  if(name==='meses')     renderMonths();
+}
+window.showPanel=showPanel;
+
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+window.closeModal=closeModal;
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast show'+(type?' '+type:'');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+function logout(){sessionStorage.removeItem('manut_logged');window.location.href='login.html';}
+window.logout=logout;
+
+loadAll();
+</script>
+</body>
+</html>
