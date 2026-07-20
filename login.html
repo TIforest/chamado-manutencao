@@ -73,7 +73,12 @@
         <option>JOSUEL OLIVEIRA</option>
         <option>PAULO HENRIQUE</option>
         <option>MARCIO ALMEIDA</option>
+        <option value="Outros">Outros (não está na lista)</option>
       </select>
+    </div>
+    <div class="field" id="campoOutroNome" style="display:none">
+      <label>Digite seu nome</label>
+      <input type="text" id="tecnicoOutroNome" placeholder="Seu nome completo">
     </div>
     <div class="field">
       <label>Senha</label>
@@ -84,6 +89,12 @@
 </div>
 <script>
   document.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+
+  const tecnicoSel = document.getElementById('tecnico');
+  const campoOutroNome = document.getElementById('campoOutroNome');
+  tecnicoSel.addEventListener('change', () => {
+    campoOutroNome.style.display = tecnicoSel.value === 'Outros' ? 'block' : 'none';
+  });
 
   // ==========================================================
   // SENHAS DOS TÉCNICOS — mude aqui pra trocar a senha de cada um
@@ -100,18 +111,33 @@
     'PAULO HENRIQUE':       '123456',
     'MARCIO ALMEIDA':       '123456'
   };
+
+  // ==========================================================
+  // SENHA PADRÃO PRA QUEM CLICA EM "OUTROS" (técnico novo) — mude aqui
+  // ==========================================================
+  const SENHA_OUTROS = 'manutencao@2026';
+
   function login() {
-    const t = document.getElementById('tecnico').value;
+    const t = tecnicoSel.value;
     const s = document.getElementById('senha').value;
     const err = document.getElementById('errorMsg');
-    if (t && USUARIOS[t] && s === USUARIOS[t]) {
+
+    if (t === 'Outros') {
+      const nome = document.getElementById('tecnicoOutroNome').value.trim().toUpperCase();
+      if (nome && s === SENHA_OUTROS) {
+        sessionStorage.setItem('manut_logged', '1');
+        sessionStorage.setItem('manut_tecnico', nome);
+        window.location.href = 'admin.html';
+        return;
+      }
+    } else if (t && USUARIOS[t] && s === USUARIOS[t]) {
       sessionStorage.setItem('manut_logged', '1');
       sessionStorage.setItem('manut_tecnico', t);
       window.location.href = 'admin.html';
-    } else {
-      err.classList.add('show');
-      setTimeout(() => err.classList.remove('show'), 3000);
+      return;
     }
+    err.classList.add('show');
+    setTimeout(() => err.classList.remove('show'), 3000);
   }
 </script>
 </body>
