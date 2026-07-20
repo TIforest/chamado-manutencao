@@ -220,9 +220,15 @@ setInterval(updateClock, 1000 * 30);
 const mes = getCurrentMonth();
 document.getElementById('mesLabel').textContent = 'Em ' + mes;
 
+function fmtNome(nome) {
+  if (!nome) return '—';
+  const m = nome.match(/^(.*) \(externo\)$/i);
+  return m ? `${m[1]} <span style="color:var(--text3);font-weight:400">(externo)</span>` : nome;
+}
+
 function ticketCard(x, statusClass, linha2) {
   return `<div class="ticket-card ${statusClass}">
-    <div class="ticket-line1">${x.lider || '—'} <span class="setor">· ${x.setor || ''}</span></div>
+    <div class="ticket-line1">${fmtNome(x.lider)} <span class="setor">· ${x.setor || ''}</span></div>
     <div class="ticket-line2"><span class="ticket-dot ${statusClass}"></span>${linha2}</div>
   </div>`;
 }
@@ -242,7 +248,7 @@ function renderTicketGrid(tickets) {
 
   const listAndamento = document.getElementById('listAndamento');
   listAndamento.innerHTML = andamentos.length
-    ? andamentos.map(x => ticketCard(x, 'andamento', `🔧 ${x.tecnicoInicio || '—'} · ${x.maquina || ''}`)).join('')
+    ? andamentos.map(x => ticketCard(x, 'andamento', `🔧 ${fmtNome(x.tecnicoInicio)} · ${x.maquina || ''}`)).join('')
     : '<div class="ticket-empty">✅ Nenhum chamado em andamento</div>';
 }
 

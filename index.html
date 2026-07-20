@@ -265,7 +265,13 @@ const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
 const LIDER = sessionStorage.getItem('lider_nome') || '';
-document.getElementById('liderNomeDisplay').textContent = LIDER || '—';
+function fmtNome(nome) {
+  if (!nome) return '—';
+  const m = nome.match(/^(.*) \(externo\)$/i);
+  return m ? `${m[1]} <span style="color:var(--text3);font-weight:400">(externo)</span>` : nome;
+}
+
+document.getElementById('liderNomeDisplay').innerHTML = fmtNome(LIDER);
 
 function logoutLider() {
   sessionStorage.removeItem('lider_logged');

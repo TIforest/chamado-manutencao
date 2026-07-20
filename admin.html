@@ -305,7 +305,7 @@ import { getFirestore, collection, doc, updateDoc, deleteDoc, query, orderBy, on
 
 if (!sessionStorage.getItem('manut_logged')) window.location.href = 'login.html';
 const TECNICO = sessionStorage.getItem('manut_tecnico') || 'Manutenção';
-document.getElementById('tecnicoNome').textContent = TECNICO;
+document.getElementById('tecnicoNome').innerHTML = fmtNome(TECNICO);
 
 const firebaseConfig = {
   apiKey: "AIzaSyCPiAWJ5q8FqVTqJ8NUgyFYqUtktqMmt94",
@@ -344,6 +344,11 @@ function fmt(iso) {
   if (!iso) return '—';
   const d = new Date(iso);
   return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+}
+function fmtNome(nome) {
+  if (!nome) return '—';
+  const m = nome.match(/^(.*) \(externo\)$/i);
+  return m ? `${m[1]} <span style="color:var(--text3);font-weight:400">(externo)</span>` : nome;
 }
 function calcTempo(iso1, iso2) {
   if (!iso1) return '—';
@@ -423,7 +428,7 @@ function renderTickets() {
   if(!t.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="icon">✅</div>Nenhum chamado novo aguardando</div></td></tr>`;return;}
   tbody.innerHTML=t.map(x=>`<tr>
     <td class="td-id">${x.id}</td>
-    <td><div class="td-name">${x.lider}</div><div class="td-sub">${x.setor}</div></td>
+    <td><div class="td-name">${fmtNome(x.lider)}</div><div class="td-sub">${x.setor}</div></td>
     <td><span style="font-size:12px">${x.maquina}</span></td>
     <td><span style="font-size:11px;color:var(--text2)">${x.tipoProblema}</span><div class="td-sub" style="max-width:200px">${x.observacao||''}</div></td>
     <td><span class="badge p${x.prioridade}">${prioLabel(x.prioridade)}</span></td>
@@ -446,12 +451,12 @@ function renderAndamento() {
   if(!t.length){tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="icon">📭</div>Nenhum chamado em andamento</div></td></tr>`;return;}
   tbody.innerHTML=t.map(x=>`<tr>
     <td class="td-id">${x.id}</td>
-    <td><div class="td-name">${x.lider}</div><div class="td-sub">${x.setor}</div></td>
+    <td><div class="td-name">${fmtNome(x.lider)}</div><div class="td-sub">${x.setor}</div></td>
     <td><span style="font-size:12px">${x.maquina}</span></td>
     <td><span class="badge p${x.prioridade}">${prioLabel(x.prioridade)}</span></td>
     <td style="font-size:12px;color:var(--yellow);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataCriacao, x.dataInicio)}</td>
     <td style="font-size:12px;color:var(--accent);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataInicio, null)}</td>
-    <td><span style="font-size:12px;color:var(--yellow);font-family:var(--mono)">${x.tecnicoInicio||'—'}</span></td>
+    <td><span style="font-size:12px;color:var(--yellow);font-family:var(--mono)">${fmtNome(x.tecnicoInicio)}</span></td>
     <td><div class="actions">
       <button class="btn-action btn-finalizar" onclick="abrirFinalizar('${x._docId}','${x.id}','${(x.lider||'').replace(/'/g,"\\'")}')">✓ Finalizar</button>
       <button class="btn-action btn-ver"       onclick="verDetalhes('${x._docId}')">👁</button>
@@ -470,11 +475,11 @@ function renderHistory() {
   if(!t.length){tbody.innerHTML=`<tr><td colspan="11"><div class="empty-state"><div class="icon">📭</div>Nenhum chamado finalizado</div></td></tr>`;return;}
   tbody.innerHTML=t.map(x=>`<tr>
     <td class="td-id">${x.id}</td>
-    <td><div class="td-name">${x.lider}</div><div class="td-sub">${x.setor}</div></td>
+    <td><div class="td-name">${fmtNome(x.lider)}</div><div class="td-sub">${x.setor}</div></td>
     <td><span style="font-size:12px">${x.maquina}</span></td>
     <td><span class="badge p${x.prioridade}">${prioLabel(x.prioridade)}</span></td>
     <td style="max-width:180px;font-size:12px;color:var(--text2)">${x.solucao||'—'}</td>
-    <td><span style="font-size:12px;color:var(--green);font-family:var(--mono)">${x.tecnicoFim||'—'}</span></td>
+    <td><span style="font-size:12px;color:var(--green);font-family:var(--mono)">${fmtNome(x.tecnicoFim)}</span></td>
     <td style="font-size:11px;color:var(--text3);font-family:var(--mono);white-space:nowrap">${fmt(x.dataFim)}</td>
     <td style="font-size:12px;color:var(--yellow);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataCriacao, x.dataInicio)}</td>
     <td style="font-size:12px;color:var(--accent);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataInicio, x.dataFim)}</td>
@@ -602,7 +607,7 @@ function verDetalhes(docId){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px">
         <div style="font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:.08em;margin-bottom:4px">LÍDER</div>
-        <div style="font-weight:600;font-size:14px">${t.lider}</div>
+        <div style="font-weight:600;font-size:14px">${fmtNome(t.lider)}</div>
         <div style="font-size:12px;color:var(--text2);margin-top:2px">${t.setor}</div>
       </div>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px">
@@ -629,11 +634,11 @@ function verDetalhes(docId){
       </div>
       ${t.dataInicio?`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px">
         <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">INICIADO</div>
-        <div style="font-size:11px;font-family:var(--mono);color:var(--yellow)">${fmt(t.dataInicio)}${t.tecnicoInicio?' · '+t.tecnicoInicio:''}</div>
+        <div style="font-size:11px;font-family:var(--mono);color:var(--yellow)">${fmt(t.dataInicio)}${t.tecnicoInicio?' · '+fmtNome(t.tecnicoInicio):''}</div>
       </div>`:''}
       ${t.dataFim?`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px">
         <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">FINALIZADO</div>
-        <div style="font-size:11px;font-family:var(--mono);color:var(--green)">${fmt(t.dataFim)}${t.tecnicoFim?' · '+t.tecnicoFim:''}</div>
+        <div style="font-size:11px;font-family:var(--mono);color:var(--green)">${fmt(t.dataFim)}${t.tecnicoFim?' · '+fmtNome(t.tecnicoFim):''}</div>
       </div>`:''}
     </div>`;
   document.getElementById('modalDetalhes').classList.add('open');
