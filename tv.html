@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manutenção — Painel TV</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Paleta oficial Forest Paper */
+    --bg:    #0A252A;
+    --bg2:   #123239;
+    --card:  #0F2C33;
+    --card2: #17383F;
+    --border:  #27464D;
+    --border2: #345861;
+    --accent:      #C5F249;
+    --accent-glow: rgba(197,242,73,0.18);
+    --purple: #C1B4EE;
+    --kraft:  #B19873;
+    --green:  #4ade80;
+    --yellow: #f59e0b;
+    --red:    #ef4444;
+    --text:  #F2F6E9;
+    --text2: #B19873;
+    --text3: #4D5C53;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Space Grotesk', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--sans); background: var(--bg); color: var(--text);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(197,242,73,0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(197,242,73,0.03) 1px, transparent 1px);
+    background-size: 56px 56px; pointer-events: none;
+  }
+  body::after {
+    content: ''; position: fixed; top: -300px; right: -300px; width: 900px; height: 900px;
+    background: radial-gradient(circle, rgba(197,242,73,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  header {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 2.6vh 4vw 1vh;
+  }
+  .logo { display: flex; align-items: center; gap: 18px; }
+  .logo-icon {
+    width: 4.2vh; height: 4.2vh; background: var(--accent); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 2.2vh; flex-shrink: 0;
+  }
+  .logo-text { font-size: 2.6vh; font-weight: 700; letter-spacing: -0.01em; }
+  .logo-text span { color: var(--text3); font-weight: 400; }
+  .live { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 1.6vh; color: var(--text2); }
+  .live-dot { width: 1.2vh; height: 1.2vh; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  #clock { font-size: 1.8vh; color: var(--text); font-family: var(--mono); margin-top: 4px; text-transform: capitalize; }
+
+  main {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2vw;
+    padding: 1vh 4vw 2vh; align-items: stretch; flex-shrink: 0;
+  }
+  .tile {
+    background: var(--card); border: 1px solid var(--border); border-radius: 24px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 2.2vh 2vw; position: relative; overflow: hidden;
+  }
+  .tile::before {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 70%; height: 3px; border-radius: 3px;
+  }
+  .tile.aberto::before    { background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+  .tile.andamento::before { background: linear-gradient(90deg, transparent, var(--yellow), transparent); }
+  .tile.finalizado::before{ background: linear-gradient(90deg, transparent, var(--green), transparent); }
+  .tile-icon { font-size: 4vh; margin-bottom: 0.6vh; }
+  .tile-num { font-size: 12vh; font-weight: 800; line-height: 1; letter-spacing: -0.03em; font-family: var(--mono); }
+  .tile.aberto .tile-num     { color: var(--accent); text-shadow: 0 0 40px rgba(197,242,73,0.4); }
+  .tile.andamento .tile-num  { color: var(--yellow); text-shadow: 0 0 40px rgba(245,158,11,0.35); }
+  .tile.finalizado .tile-num { color: var(--green);  text-shadow: 0 0 40px rgba(74,222,128,0.35); }
+  .tile-label { font-size: 2vh; font-weight: 600; color: var(--text); margin-top: 1vh; text-align: center; }
+  .tile-sub { font-size: 1.3vh; color: var(--text3); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 3px; text-align: center; }
+
+  .section {
+    position: relative; z-index: 1; flex: 1; min-height: 0;
+    padding: 0 4vw 2vh;
+  }
+  .columns {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 3vw;
+    height: 100%;
+  }
+  .column {
+    display: flex; flex-direction: column; min-height: 0;
+    position: relative;
+  }
+  .column:first-child::after {
+    content: ''; position: absolute; top: 0; bottom: 0; right: -1.5vw; width: 1px;
+    background: linear-gradient(180deg, transparent, var(--border), transparent);
+  }
+  .column-header {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 2vh; font-weight: 700; color: var(--text);
+    margin-bottom: 1.2vh; flex-shrink: 0;
+  }
+  .column-header .col-dot { width: 1.4vh; height: 1.4vh; border-radius: 50%; flex-shrink: 0; }
+  .column-header.aberto .col-dot { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .column-header.andamento .col-dot { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+  .column-header .count-badge {
+    font-family: var(--mono); font-size: 1.5vh; font-weight: 700; padding: 2px 11px;
+    border-radius: 20px; margin-left: auto;
+  }
+  .column-header.aberto .count-badge    { background: rgba(197,242,73,0.14); color: var(--accent); border: 1px solid rgba(197,242,73,0.3); }
+  .column-header.andamento .count-badge { background: rgba(245,158,11,0.14); color: var(--yellow); border: 1px solid rgba(245,158,11,0.3); }
+  .column-list {
+    display: flex; flex-direction: column; gap: 1.1vh;
+    overflow-y: auto; flex: 1; align-content: start;
+  }
+  .ticket-card {
+    background: var(--card); border: 1px solid var(--border); border-left: 6px solid var(--accent);
+    border-radius: 14px; padding: 1.5vh 1.6vw;
+  }
+  .ticket-card.andamento { border-left-color: var(--yellow); }
+  .ticket-line1 { font-size: 2.1vh; font-weight: 700; color: var(--text); }
+  .ticket-line1 .setor { font-weight: 400; color: var(--text2); font-size: 1.7vh; }
+  .ticket-line2 { display: flex; align-items: center; gap: 8px; font-size: 1.6vh; color: var(--text2); font-family: var(--mono); margin-top: 7px; }
+  .ticket-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .ticket-dot.aberto { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+  .ticket-dot.andamento { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+  .ticket-empty { color: var(--text3); font-size: 1.7vh; text-align: center; padding: 3vh; font-family: var(--mono); }
+
+  footer {
+    position: relative; z-index: 1; text-align: center; padding: 0 0 2.2vh;
+    font-family: var(--mono); font-size: 1.4vh; color: var(--text3); letter-spacing: 0.06em;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🔧</div>
+    <div>
+      <div class="logo-text">Manutenção <span>/ Painel Geral</span></div>
+      <div id="clock">—</div>
+    </div>
+  </div>
+  <div class="live"><div class="live-dot"></div>AO VIVO</div>
+</header>
+
+<main>
+  <div class="tile aberto">
+    <div class="tile-icon">📋</div>
+    <div class="tile-num" id="numAberto">—</div>
+    <div class="tile-label">Chamados Abertos</div>
+    <div class="tile-sub">Aguardando atendimento</div>
+  </div>
+  <div class="tile andamento">
+    <div class="tile-icon">⚡</div>
+    <div class="tile-num" id="numAndamento">—</div>
+    <div class="tile-label">Em Andamento</div>
+    <div class="tile-sub">Sendo atendidos agora</div>
+  </div>
+  <div class="tile finalizado">
+    <div class="tile-icon">✅</div>
+    <div class="tile-num" id="numFinalizado">—</div>
+    <div class="tile-label">Finalizados</div>
+    <div class="tile-sub" id="mesLabel">Neste mês</div>
+  </div>
+</main>
+
+<div class="section">
+  <div class="columns">
+    <div class="column">
+      <div class="column-header aberto"><span class="col-dot"></span>Chamados Abertos<span class="count-badge" id="countAbertoCol">0</span></div>
+      <div class="column-list" id="listAberto"><div class="ticket-empty">Carregando...</div></div>
+    </div>
+    <div class="column">
+      <div class="column-header andamento"><span class="col-dot"></span>Em Andamento<span class="count-badge" id="countAndamentoCol">0</span></div>
+      <div class="column-list" id="listAndamento"><div class="ticket-empty">Carregando...</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>Manutenção © 2026 — Atualização automática em tempo real</footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCPiAWJ5q8FqVTqJ8NUgyFYqUtktqMmt94",
+  authDomain: "chamado-manutencao.firebaseapp.com",
+  projectId: "chamado-manutencao",
+  storageBucket: "chamado-manutencao.firebasestorage.app",
+  messagingSenderId: "329198000958",
+  appId: "1:329198000958:web:05c31243c0ecb11c25ea6f"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+function getCurrentMonth() {
+  const now = new Date();
+  return `${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
+}
+
+function updateClock() {
+  document.getElementById('clock').textContent = new Date().toLocaleString('pt-BR', {
+    weekday: 'long', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+  });
+}
+updateClock();
+setInterval(updateClock, 1000 * 30);
+
+const mes = getCurrentMonth();
+document.getElementById('mesLabel').textContent = 'Em ' + mes;
+
+function ticketCard(x, statusClass, linha2) {
+  return `<div class="ticket-card ${statusClass}">
+    <div class="ticket-line1">${x.lider || '—'} <span class="setor">· ${x.setor || ''}</span></div>
+    <div class="ticket-line2"><span class="ticket-dot ${statusClass}"></span>${linha2}</div>
+  </div>`;
+}
+
+function renderTicketGrid(tickets) {
+  const byOldest = (a, b) => (a.dataCriacao||'').localeCompare(b.dataCriacao||'');
+  const abertos = tickets.filter(x => x.status === 'Aberto').sort(byOldest);
+  const andamentos = tickets.filter(x => x.status === 'Em andamento').sort(byOldest);
+
+  document.getElementById('countAbertoCol').textContent = abertos.length;
+  document.getElementById('countAndamentoCol').textContent = andamentos.length;
+
+  const listAberto = document.getElementById('listAberto');
+  listAberto.innerHTML = abertos.length
+    ? abertos.map(x => ticketCard(x, 'aberto', `⏳ Aguardando início · ${x.maquina || ''}`)).join('')
+    : '<div class="ticket-empty">✅ Nenhum chamado aberto</div>';
+
+  const listAndamento = document.getElementById('listAndamento');
+  listAndamento.innerHTML = andamentos.length
+    ? andamentos.map(x => ticketCard(x, 'andamento', `🔧 ${x.tecnicoInicio || '—'} · ${x.maquina || ''}`)).join('')
+    : '<div class="ticket-empty">✅ Nenhum chamado em andamento</div>';
+}
+
+const q = query(collection(db, 'chamados'));
+onSnapshot(q, (snap) => {
+  const tickets = snap.docs.map(d => d.data());
+  const aberto = tickets.filter(x => x.status === 'Aberto').length;
+  const andamento = tickets.filter(x => x.status === 'Em andamento').length;
+  const finalizado = tickets.filter(x => x.status === 'Finalizado' && x.mes === mes).length;
+  document.getElementById('numAberto').textContent = aberto;
+  document.getElementById('numAndamento').textContent = andamento;
+  document.getElementById('numFinalizado').textContent = finalizado;
+  renderTicketGrid(tickets);
+}, err => {
+  console.error('Firebase error:', err);
+});
+</script>
+</body>
+</html>

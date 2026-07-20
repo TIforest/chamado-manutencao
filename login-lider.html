@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Manutenção — Login Administrativo</title>
+<title>Manutenção — Identificação do Líder</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -30,8 +30,6 @@
   .orb2 { bottom: -150px; right: -150px; background: radial-gradient(circle, rgba(193,180,238,0.06) 0%, transparent 70%); }
   .login-wrap { position: relative; z-index: 1; width: 100%; max-width: 420px; padding: 20px; animation: fadeIn 0.5s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-  .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--text3); font-size: 13px; text-decoration: none; margin-bottom: 28px; transition: color 0.2s; }
-  .back-link:hover { color: var(--text2); }
   .card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 40px 36px; position: relative; overflow: hidden; }
   .card::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 60%; height: 1px; background: linear-gradient(90deg, transparent, rgba(197,242,73,0.4), transparent); }
   .card-icon { width: 52px; height: 52px; background: rgba(197,242,73,0.1); border: 1px solid rgba(197,242,73,0.2); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 22px; }
@@ -53,61 +51,50 @@
 <div class="orb orb1"></div>
 <div class="orb orb2"></div>
 <div class="login-wrap">
-  <a href="index.html" class="back-link">← Voltar ao formulário</a>
   <div class="card">
-    <div class="card-icon">🔧</div>
-    <h1>Painel de Manutenção</h1>
-    <p class="subtitle">Selecione seu nome e entre com sua senha.</p>
-    <div class="error-msg" id="errorMsg">⚠️ Técnico ou senha incorretos.</div>
+    <div class="card-icon">🙋</div>
+    <h1>Quem está abrindo o chamado?</h1>
+    <p class="subtitle">Selecione seu nome e entre com sua senha antes de preencher o chamado.</p>
+    <div class="error-msg" id="errorMsg">⚠️ Líder ou senha incorretos.</div>
     <div class="field">
-      <label>Técnico</label>
-      <select id="tecnico">
+      <label>Líder</label>
+      <select id="lider">
         <option value="">Selecione...</option>
-        <option>AMARILDO SILVA</option>
-        <option>CLEYTON MOREIRA</option>
-        <option>VITTOR LODONHO</option>
-        <option>VINICIUS SANTOS</option>
-        <option>EVERSON SANTOS</option>
-        <option>ALESSANDRO RODRIGUES</option>
-        <option>MATHEUS OLIVEIRA</option>
-        <option>JOSUEL OLIVEIRA</option>
-        <option>PAULO HENRIQUE</option>
-        <option>MARCIO ALMEIDA</option>
+        <option>FERNANDO BETIM</option>
+        <option>SAMUEL LIMA</option>
+        <option>JOVENIL SILVA</option>
+        <option>ARGEU CARVALHO</option>
+        <option>PAULO CUNHA</option>
       </select>
     </div>
     <div class="field">
       <label>Senha</label>
       <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password">
     </div>
-    <button class="btn-login" onclick="login()">Entrar no painel</button>
+    <button class="btn-login" onclick="login()">Entrar e abrir chamado</button>
   </div>
 </div>
 <script>
   document.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
 
   // ==========================================================
-  // SENHAS DOS TÉCNICOS — mude aqui pra trocar a senha de cada um
+  // SENHAS DOS LÍDERES — mude aqui pra trocar a senha de cada um
   // ==========================================================
   const USUARIOS = {
-    'AMARILDO SILVA':       '123456',
-    'CLEYTON MOREIRA':      '123456',
-    'VITTOR LODONHO':       '123456',
-    'VINICIUS SANTOS':      '123456',
-    'EVERSON SANTOS':       '123456',
-    'ALESSANDRO RODRIGUES': '123456',
-    'MATHEUS OLIVEIRA':     '123456',
-    'JOSUEL OLIVEIRA':      '123456',
-    'PAULO HENRIQUE':       '123456',
-    'MARCIO ALMEIDA':       '123456'
+    'FERNANDO BETIM':  '123456',
+    'SAMUEL LIMA':     '123456',
+    'JOVENIL SILVA':   '123456',
+    'ARGEU CARVALHO':  '123456',
+    'PAULO CUNHA':     '123456'
   };
   function login() {
-    const t = document.getElementById('tecnico').value;
+    const l = document.getElementById('lider').value;
     const s = document.getElementById('senha').value;
     const err = document.getElementById('errorMsg');
-    if (t && USUARIOS[t] && s === USUARIOS[t]) {
-      sessionStorage.setItem('manut_logged', '1');
-      sessionStorage.setItem('manut_tecnico', t);
-      window.location.href = 'admin.html';
+    if (l && USUARIOS[l] && s === USUARIOS[l]) {
+      sessionStorage.setItem('lider_logged', '1');
+      sessionStorage.setItem('lider_nome', l);
+      window.location.href = 'index.html';
     } else {
       err.classList.add('show');
       setTimeout(() => err.classList.remove('show'), 3000);

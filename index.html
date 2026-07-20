@@ -7,25 +7,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:    #14100b;
-    --bg2:   #1d1710;
-    --bg3:   #251d14;
-    --card:  #1a1510;
-    --card2: #241c14;
+    /* Paleta oficial Forest Paper */
+    --bg:    #0A252A;  /* Verde Escuro */
+    --bg2:   #123239;
+    --bg3:   #1A3F46;
+    --card:  #0F2C33;
+    --card2: #17383F;
 
-    --border:  #3a2e1e;
-    --border2: #4a3a26;
+    --border:  #27464D;
+    --border2: #345861;
 
-    --accent:      #f59e0b;
-    --accent-glow: rgba(245,158,11,0.18);
+    --accent:      #C5F249;  /* Verde Claro */
+    --accent-glow: rgba(197,242,73,0.18);
+
+    --purple: #C1B4EE;  /* Roxo Destaque */
+    --kraft:  #B19873;  /* Bege Kraft */
 
     --green:  #4ade80;
     --yellow: #f59e0b;
     --red:    #ef4444;
 
-    --text:  #f0e6d8;
-    --text2: #b3a088;
-    --text3: #6b5940;
+    --text:  #F2F6E9;
+    --text2: #B19873;
+    --text3: #4D5C53;
 
     --mono: 'JetBrains Mono', monospace;
     --sans: 'Space Grotesk', sans-serif;
@@ -35,30 +39,30 @@
   body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
   body::before {
     content: ''; position: fixed; inset: 0;
-    background-image: linear-gradient(rgba(245,158,11,0.025) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(245,158,11,0.025) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(197,242,73,0.025) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(197,242,73,0.025) 1px, transparent 1px);
     background-size: 40px 40px; pointer-events: none; z-index: 0;
   }
   body::after {
     content: ''; position: fixed; top: -200px; right: -200px; width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(245,158,11,0.06) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(197,242,73,0.06) 0%, transparent 70%);
     pointer-events: none; z-index: 0;
   }
   .container { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 0 20px; }
-  header { position: sticky; top: 0; z-index: 100; background: rgba(20,16,11,0.88); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); padding: 0 40px; }
+  header { position: sticky; top: 0; z-index: 100; background: rgba(10,37,42,0.88); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); padding: 0 40px; }
   .header-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 60px; }
   .logo { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; letter-spacing: 0.02em; }
   .logo-icon { width: 28px; height: 28px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
   .logo span { color: var(--text2); font-weight: 400; }
   .btn-admin { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: transparent; border: 1px solid var(--border2); border-radius: 8px; color: var(--text2); font-family: var(--sans); font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.2s; }
-  .btn-admin:hover { border-color: var(--accent); color: var(--accent); background: rgba(245,158,11,0.06); }
+  .btn-admin:hover { border-color: var(--accent); color: var(--accent); background: rgba(197,242,73,0.06); }
   .btn-admin svg { width: 14px; height: 14px; }
   .hero { padding: 60px 0 40px; text-align: center; }
-  .hero-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); border-radius: 20px; font-size: 11px; font-family: var(--mono); color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 24px; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; background: rgba(197,242,73,0.08); border: 1px solid rgba(197,242,73,0.2); border-radius: 20px; font-size: 11px; font-family: var(--mono); color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 24px; }
   .hero-badge::before { content: ''; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
   @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
   .hero h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 14px; }
-  .hero h1 span { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero h1 span { color: var(--accent); }
   .hero p { font-size: 15px; color: var(--text2); max-width: 460px; margin: 0 auto; line-height: 1.6; }
   .form-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 36px; margin-bottom: 40px; animation: slideUp 0.4s ease; }
   @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -74,13 +78,13 @@
   input, select, textarea { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 14px; font-family: var(--sans); font-size: 16px; color: var(--text); transition: all 0.2s; outline: none; appearance: none; -webkit-appearance: none; width: 100%; }
   input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); background: var(--bg3); }
   input::placeholder, textarea::placeholder { color: var(--text3); }
-  select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23b3a088' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
+  select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23b19873' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
   textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
   .radio-group { display: flex; gap: 10px; flex-wrap: wrap; }
   .radio-option { flex: 1; min-width: 110px; position: relative; }
   .radio-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
   .radio-option label { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 14px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text2); transition: all 0.2s; text-align: center; }
-  .radio-option input[type="radio"]:checked + label { background: rgba(245,158,11,0.08); border-color: var(--accent); color: var(--accent); }
+  .radio-option input[type="radio"]:checked + label { background: rgba(197,242,73,0.08); border-color: var(--accent); color: var(--accent); }
   .radio-option label:hover { border-color: var(--border2); color: var(--text); }
 
   .prio-group { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -93,8 +97,8 @@
   .prio-option[data-p="3"] input:checked + label { background: rgba(239,68,68,0.1); border-color: var(--red); color: #f87171; }
   .prio-option label:hover { border-color: var(--border2); }
 
-  .btn-submit { width: 100%; padding: 16px 24px; background: var(--accent); border: none; border-radius: 10px; font-family: var(--sans); font-size: 16px; font-weight: 600; color: #14100b; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; letter-spacing: 0.01em; margin-top: 8px; }
-  .btn-submit:hover { background: #fbbf24; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(245,158,11,0.25); }
+  .btn-submit { width: 100%; padding: 16px 24px; background: var(--accent); border: none; border-radius: 10px; font-family: var(--sans); font-size: 16px; font-weight: 600; color: #0A252A; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; letter-spacing: 0.01em; margin-top: 8px; }
+  .btn-submit:hover { background: #C5F249; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(197,242,73,0.25); }
   .btn-submit:active { transform: translateY(0); }
   .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
   .btn-submit svg { width: 18px; height: 18px; flex-shrink: 0; }
@@ -105,6 +109,10 @@
   .toast-msg { font-size: 12px; color: var(--text2); line-height: 1.4; }
   .toast-id { font-family: var(--mono); font-size: 11px; color: var(--accent); margin-top: 4px; }
   footer { text-align: center; padding: 30px 20px; font-family: var(--mono); font-size: 11px; color: var(--text3); border-top: 1px solid var(--border); position: relative; z-index: 1; }
+  .lider-bar { position: relative; z-index: 1; background: rgba(197,242,73,0.06); border-bottom: 1px solid var(--border); padding: 10px 20px; text-align: center; font-size: 13px; color: var(--text2); }
+  .lider-bar strong { color: var(--accent); }
+  .lider-trocar { margin-left: 14px; color: var(--text3); text-decoration: underline; cursor: pointer; }
+  .lider-trocar:hover { color: var(--text2); }
   @media (max-width: 600px) {
     .form-card { padding: 24px 18px; }
     .field-grid.cols2, .field-grid.cols3 { grid-template-columns: 1fr; }
@@ -113,6 +121,15 @@
 </style>
 </head>
 <body>
+<script>
+  // Exige login do líder antes de mostrar o formulário (evita selecionar o líder errado)
+  if (!sessionStorage.getItem('lider_logged')) { window.location.href = 'login-lider.html'; }
+</script>
+
+<div class="lider-bar">
+  🙋 Aberto por <strong id="liderNomeDisplay">—</strong>
+  <a class="lider-trocar" onclick="logoutLider()">Trocar usuário</a>
+</div>
 
 <header>
   <div class="header-inner">
@@ -140,20 +157,6 @@
       <div class="form-section">
         <div class="section-label">Identificação</div>
         <div class="field-grid">
-          <div class="field">
-            <label>Nome do líder <span class="req">*</span></label>
-            <select id="lider" required>
-              <option value="">Selecione...</option>
-              <option>FERNANDO BETIM</option>
-              <option>SAMUEL LIMA</option>
-              <option>JOVENIL SILVA</option>
-              <option>ARGEU CARVALHO</option>
-              <option>PAULO CUNHA</option>
-              <option value="Outro">Outro (digitar nome)</option>
-            </select>
-            <input type="text" id="liderOutro" placeholder="Digite o nome do líder" style="display:none;margin-top:6px">
-          </div>
-
           <div class="field">
             <label>Setor solicitante <span class="req">*</span></label>
             <select id="setor" required>
@@ -261,6 +264,16 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
+const LIDER = sessionStorage.getItem('lider_nome') || '';
+document.getElementById('liderNomeDisplay').textContent = LIDER || '—';
+
+function logoutLider() {
+  sessionStorage.removeItem('lider_logged');
+  sessionStorage.removeItem('lider_nome');
+  window.location.href = 'login-lider.html';
+}
+window.logoutLider = logoutLider;
+
 const MAQUINAS_POR_SETOR = {
   'CORTE': ['CORTADEIRA 01 - MASSON SCOTT','CORTADEIRA 02 - MARQUIP','CORTADEIRA 03 - JAGENBERG 01','CORTADEIRA 04 - JAGENBERG 02','GUILHOTINA','GUILHOTINA DE CANTONEIRA','SPLIPSHEET','SERRA BOBINAS','SERRA TUBETES'],
   'REBOBINAGEM': ['REBOBINADEIRA 01 - TETRAPEL','REBOBINADEIRA 02 - BESTICE 2600','REBOBINADEIRA 03 - IPPEL','REBOBINADEIRA 04 - BESTICE 2000',"REBOBINADEIRA 05 - D'ADREA"],
@@ -273,12 +286,6 @@ const MAQUINAS_POR_SETOR = {
   'EMPILHADEIRAS': ['OFICINA DE EMPILHADEIRAS'],
   'ÁREAS GERAIS': ['MANUTENÇÃO']
 };
-
-const liderSel = document.getElementById('lider');
-const liderOutro = document.getElementById('liderOutro');
-liderSel.addEventListener('change', () => {
-  liderOutro.style.display = liderSel.value === 'Outro' ? 'block' : 'none';
-});
 
 const setorSel = document.getElementById('setor');
 const maquinaSel = document.getElementById('maquina');
@@ -315,14 +322,15 @@ document.getElementById('ticketForm').addEventListener('submit', async function(
   e.preventDefault();
   const btn = document.getElementById('btnSubmit');
 
-  const lider = liderSel.value === 'Outro' ? liderOutro.value.trim() : liderSel.value;
+  const lider = LIDER;
   const setor = setorSel.value;
   const maquina = maquinaSel.value === 'Outro' ? maquinaOutro.value.trim() : maquinaSel.value;
   const tipoProblemaEl = document.querySelector('input[name="tipoProblema"]:checked');
   const observacao = document.getElementById('observacao').value.trim();
   const prioridadeEl = document.querySelector('input[name="prioridade"]:checked');
 
-  if (!lider || !setor || !maquina || !observacao || !prioridadeEl) {
+  if (!lider) { window.location.href = 'login-lider.html'; return; }
+  if (!setor || !maquina || !observacao || !prioridadeEl) {
     alert('Por favor, preencha todos os campos obrigatórios.');
     return;
   }
@@ -346,13 +354,14 @@ document.getElementById('ticketForm').addEventListener('submit', async function(
     document.getElementById('toastId').textContent = 'ID: ' + id;
     const toast = document.getElementById('toast');
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 4500);
     this.reset();
     maquinaSel.innerHTML = '<option value="">Selecione o setor primeiro...</option>';
     maquinaSel.disabled = true;
-    liderOutro.style.display = 'none';
     maquinaOutro.style.display = 'none';
     document.getElementById('pr_1').checked = false;
+    // Tablet compartilhado: desloga o líder após enviar, pra próxima pessoa precisar logar de novo
+    setTimeout(logoutLider, 2800);
+    return;
   } catch (err) {
     alert('Erro ao enviar chamado.\n' + err.message);
     console.error(err);

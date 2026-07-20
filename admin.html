@@ -7,27 +7,30 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:    #14100b;
-    --bg2:   #1d1710;
-    --bg3:   #251d14;
-    --card:  #1a1510;
-    --card2: #241c14;
-    --border:  #3a2e1e;
-    --border2: #4a3a26;
-    --accent:      #f59e0b;
-    --accent-glow: rgba(245,158,11,0.18);
+    /* Paleta oficial Forest Paper */
+    --bg:    #0A252A;
+    --bg2:   #123239;
+    --bg3:   #1A3F46;
+    --card:  #0F2C33;
+    --card2: #17383F;
+    --border:  #27464D;
+    --border2: #345861;
+    --accent:      #C5F249;
+    --accent-glow: rgba(197,242,73,0.18);
+    --purple: #C1B4EE;
+    --kraft:  #B19873;
     --green:  #4ade80;
     --yellow: #f59e0b;
     --red:    #ef4444;
-    --text:  #f0e6d8;
-    --text2: #b3a088;
-    --text3: #6b5940;
+    --text:  #F2F6E9;
+    --text2: #B19873;
+    --text3: #4D5C53;
     --mono: 'JetBrains Mono', monospace;
     --sans: 'Space Grotesk', sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
-  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(245,158,11,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(245,158,11,0.02) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(197,242,73,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(197,242,73,0.02) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
 
   .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 220px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 50; }
   .sidebar-header { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
@@ -37,16 +40,18 @@
   .nav { flex: 1; padding: 12px 10px; }
   .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; transition: all 0.15s; margin-bottom: 2px; }
   .nav-item:hover { background: var(--border); color: var(--text); }
-  .nav-item.active { background: rgba(245,158,11,0.08); color: var(--accent); }
+  .nav-item.active { background: rgba(197,242,73,0.08); color: var(--accent); }
   .nav-item .icon { font-size: 15px; width: 20px; text-align: center; }
-  .nav-badge { margin-left: auto; background: var(--accent); color: #14100b; font-size: 10px; font-family: var(--mono); font-weight: 700; padding: 2px 6px; border-radius: 10px; min-width: 18px; text-align: center; display: none; }
+  .nav-badge { margin-left: auto; background: var(--accent); color: #0A252A; font-size: 10px; font-family: var(--mono); font-weight: 700; padding: 2px 6px; border-radius: 10px; min-width: 18px; text-align: center; display: none; }
   .nav-badge.show { display: block; }
   .nav-badge.yellow { background: var(--yellow); color: #000; }
   .sidebar-footer { padding: 12px 10px; border-top: 1px solid var(--border); }
-  .nav-item { }
+  .tecnico-info { padding: 10px 12px; margin-bottom: 4px; background: rgba(197,242,73,0.05); border: 1px solid rgba(197,242,73,0.12); border-radius: 8px; }
+  .tecnico-label { font-size: 10px; color: var(--text3); font-family: var(--mono); letter-spacing: 0.06em; }
+  .tecnico-nome { font-size: 13px; font-weight: 600; color: var(--accent); }
 
   .main { margin-left: 220px; min-height: 100vh; position: relative; z-index: 1; }
-  .topbar { height: 58px; background: rgba(20,16,11,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 40; }
+  .topbar { height: 58px; background: rgba(10,37,42,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 40; }
   .page-title { font-size: 16px; font-weight: 600; }
   .topbar-right { display: flex; align-items: center; gap: 12px; }
   .badge-count { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); font-family: var(--mono); }
@@ -70,24 +75,24 @@
   .filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .filter-input, .filter-select { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; font-family: var(--sans); font-size: 12px; color: var(--text); outline: none; transition: border-color 0.2s; appearance: none; -webkit-appearance: none; }
   .filter-input { min-width: 180px; }
-  .filter-select { cursor: pointer; padding-right: 28px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23b3a088' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+  .filter-select { cursor: pointer; padding-right: 28px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23b19873' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
   .filter-input:focus, .filter-select:focus { border-color: var(--accent); }
   .filter-input::placeholder { color: var(--text3); }
   .btn-export { display: flex; align-items: center; gap: 7px; padding: 7px 14px; background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.18); border-radius: 8px; font-family: var(--sans); font-size: 12px; font-weight: 500; color: var(--green); cursor: pointer; transition: all 0.2s; }
   .btn-export:hover { background: rgba(74,222,128,0.15); }
-  .btn-refresh { display: flex; align-items: center; gap: 7px; padding: 7px 14px; background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.15); border-radius: 8px; font-family: var(--sans); font-size: 12px; font-weight: 500; color: var(--accent); cursor: pointer; transition: all 0.2s; }
+  .btn-refresh { display: flex; align-items: center; gap: 7px; padding: 7px 14px; background: rgba(197,242,73,0.07); border: 1px solid rgba(197,242,73,0.15); border-radius: 8px; font-family: var(--sans); font-size: 12px; font-weight: 500; color: var(--accent); cursor: pointer; transition: all 0.2s; }
 
   .table-wrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th { background: var(--bg2); padding: 10px 14px; text-align: left; font-size: 11px; font-family: var(--mono); color: var(--text3); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 1px solid var(--border); white-space: nowrap; }
   td { padding: 11px 14px; border-bottom: 1px solid rgba(58,46,30,0.6); vertical-align: middle; }
   tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(245,158,11,0.02); }
+  tr:hover td { background: rgba(197,242,73,0.02); }
   .td-id { font-family: var(--mono); font-size: 12px; color: var(--accent); }
   .td-name { font-weight: 500; } .td-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
 
   .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
-  .badge.aberto    { background: rgba(245,158,11,0.1);  color: #f59e0b; border: 1px solid rgba(245,158,11,0.2); }
+  .badge.aberto    { background: rgba(197,242,73,0.1);  color: #C5F249; border: 1px solid rgba(197,242,73,0.2); }
   .badge.andamento { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
   .badge.finalizado{ background: rgba(74,222,128,0.1);  color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
   .badge.p1 { background: rgba(74,222,128,0.1);  color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
@@ -100,8 +105,8 @@
   .btn-iniciar:hover  { background: rgba(245,158,11,0.2); }
   .btn-finalizar{ background: rgba(74,222,128,0.1);  border-color: rgba(74,222,128,0.25);  color: #4ade80; }
   .btn-finalizar:hover{ background: rgba(74,222,128,0.2); }
-  .btn-ver      { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.2);   color: var(--accent); }
-  .btn-ver:hover      { background: rgba(245,158,11,0.15); }
+  .btn-ver      { background: rgba(197,242,73,0.08); border-color: rgba(197,242,73,0.2);   color: var(--accent); }
+  .btn-ver:hover      { background: rgba(197,242,73,0.15); }
   .btn-del      { background: rgba(239,68,68,0.08);  border-color: rgba(239,68,68,0.2);    color: #f87171; }
   .btn-del:hover      { background: rgba(239,68,68,0.16); }
 
@@ -112,7 +117,7 @@
   .month-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
   .btn-month { padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); font-family: var(--sans); font-size: 12px; font-weight: 500; color: var(--text2); cursor: pointer; transition: all 0.15s; }
   .btn-month:hover { border-color: var(--border2); color: var(--text); }
-  .btn-month.active { background: rgba(245,158,11,0.15); border-color: #f59e0b; color: #f59e0b; font-weight: 700; box-shadow: 0 0 8px rgba(245,158,11,0.2); }
+  .btn-month.active { background: rgba(197,242,73,0.15); border-color: #C5F249; color: #C5F249; font-weight: 700; box-shadow: 0 0 8px rgba(197,242,73,0.2); }
   .btn-download-month { display: flex; align-items: center; gap: 7px; padding: 7px 14px; background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); border-radius: 8px; font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--green); cursor: pointer; transition: all 0.15s; }
   .btn-download-month:hover { background: rgba(74,222,128,0.2); border-color: rgba(74,222,128,0.5); }
 
@@ -123,12 +128,15 @@
   .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
   .modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
   .modal label { display: block; font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
-  .modal select, .modal input { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 9px; padding: 11px 14px; font-family: var(--sans); font-size: 14px; color: var(--text); outline: none; transition: border-color 0.2s; margin-bottom: 16px; appearance: none; -webkit-appearance: none; }
-  .modal select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23b3a088' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
-  .modal select:focus, .modal input:focus { border-color: var(--accent); }
+  .modal select, .modal input, .modal textarea { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 9px; padding: 11px 14px; font-family: var(--sans); font-size: 14px; color: var(--text); outline: none; transition: border-color 0.2s; margin-bottom: 16px; appearance: none; -webkit-appearance: none; }
+  .modal select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23b19873' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+  .modal textarea { resize: vertical; min-height: 100px; line-height: 1.5; font-family: var(--sans); }
+  .modal select:focus, .modal input:focus, .modal textarea:focus { border-color: var(--accent); }
+  .modal .error-msg { display: none; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #f87171; margin-bottom: 16px; align-items: center; gap: 8px; }
+  .modal .error-msg.show { display: flex; }
   .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
   .btn-cancel  { padding: 9px 18px; border-radius: 8px; border: 1px solid var(--border); background: transparent; font-family: var(--sans); font-size: 13px; color: var(--text2); cursor: pointer; }
-  .btn-confirm { padding: 9px 18px; border-radius: 8px; border: none; background: var(--green); font-family: var(--sans); font-size: 13px; font-weight: 600; color: #14100b; cursor: pointer; }
+  .btn-confirm { padding: 9px 18px; border-radius: 8px; border: none; background: var(--green); font-family: var(--sans); font-size: 13px; font-weight: 600; color: #0A252A; cursor: pointer; }
   .btn-confirm:hover { background: #22c55e; }
   .btn-confirm:disabled { opacity: 0.6; cursor: not-allowed; }
 
@@ -165,6 +173,10 @@
     </div>
   </div>
   <div class="sidebar-footer">
+    <div class="tecnico-info">
+      <div class="tecnico-label">LOGADO COMO</div>
+      <div class="tecnico-nome" id="tecnicoNome">—</div>
+    </div>
     <div class="nav-item" onclick="logout()"><span class="icon">🚪</span> Sair</div>
   </div>
 </nav>
@@ -223,7 +235,7 @@
           <button class="btn-refresh" onclick="loadAll()">🔄 Atualizar</button>
         </div>
       </div>
-      <div class="table-wrap"><table><thead><tr><th>ID</th><th>Líder / Setor</th><th>Máquina</th><th>Prioridade</th><th>Técnico</th><th>Data Fim</th><th>T. espera</th><th>T. andamento</th><th>Mês</th><th></th></tr></thead><tbody id="histTable"></tbody></table></div>
+      <div class="table-wrap"><table><thead><tr><th>ID</th><th>Líder / Setor</th><th>Máquina</th><th>Prioridade</th><th>Solução</th><th>Técnico</th><th>Data Fim</th><th>T. espera</th><th>T. andamento</th><th>Mês</th><th></th></tr></thead><tbody id="histTable"></tbody></table></div>
     </div>
 
     <div class="panel" id="panel-meses">
@@ -233,42 +245,29 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="modalIniciar">
-  <div class="modal">
-    <div class="modal-title">▶ Iniciar Chamado</div>
-    <div class="modal-sub" id="modalIniciarSub"></div>
-    <label>Técnico que vai iniciar</label>
-    <select id="tecnicoIniciarSel">
-      <option value="">Selecione...</option>
-      <option>AMARILDO SILVA</option><option>CLEYTON MOREIRA</option><option>VITTOR LODONHO</option>
-      <option>VINICIUS SANTOS</option><option>EVERSON SANTOS</option><option>ALESSANDRO RODRIGUES</option>
-      <option>MATHEUS OLIVEIRA</option><option>JOSUEL OLIVEIRA</option><option>PAULO HENRIQUE</option>
-      <option>MARCIO ALMEIDA</option><option value="Outro">Outro (digitar nome)</option>
-    </select>
-    <input type="text" id="tecnicoIniciarOutro" placeholder="Digite o nome do técnico" style="display:none">
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('modalIniciar')">Cancelar</button>
-      <button class="btn-confirm" id="btnConfirmarIniciar" onclick="confirmarIniciar()">Iniciar</button>
-    </div>
-  </div>
-</div>
-
 <div class="modal-overlay" id="modalFinalizar">
   <div class="modal">
     <div class="modal-title">✅ Finalizar Chamado</div>
     <div class="modal-sub" id="modalFinalizarSub"></div>
-    <label>Técnico que finalizou</label>
-    <select id="tecnicoFinalizarSel">
-      <option value="">Selecione...</option>
-      <option>AMARILDO SILVA</option><option>CLEYTON MOREIRA</option><option>VITTOR LODONHO</option>
-      <option>VINICIUS SANTOS</option><option>EVERSON SANTOS</option><option>ALESSANDRO RODRIGUES</option>
-      <option>MATHEUS OLIVEIRA</option><option>JOSUEL OLIVEIRA</option><option>PAULO HENRIQUE</option>
-      <option>MARCIO ALMEIDA</option><option value="Outro">Outro (digitar nome)</option>
-    </select>
-    <input type="text" id="tecnicoFinalizarOutro" placeholder="Digite o nome do técnico" style="display:none">
+    <label>O que foi feito para resolver?</label>
+    <textarea id="solucaoInput" placeholder="Descreva o que foi feito para resolver o problema..."></textarea>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('modalFinalizar')">Cancelar</button>
       <button class="btn-confirm" id="btnConfirmarFinalizar" onclick="confirmarFinalizar()">Finalizar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalCancelar">
+  <div class="modal">
+    <div class="modal-title">🗑️ Cancelar Chamado</div>
+    <div class="modal-sub" id="modalCancelarSub"></div>
+    <div class="error-msg" id="cancelarErrorMsg">⚠️ Senha incorreta.</div>
+    <label>Senha para cancelar</label>
+    <input type="password" id="cancelarSenha" placeholder="••••••••">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modalCancelar')">Voltar</button>
+      <button class="btn-confirm" id="btnConfirmarCancelar" onclick="confirmarCancelamento()" style="background:var(--red);color:#fff">Cancelar chamado</button>
     </div>
   </div>
 </div>
@@ -289,6 +288,8 @@ import { getFirestore, collection, doc, updateDoc, deleteDoc, query, orderBy, on
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 if (!sessionStorage.getItem('manut_logged')) window.location.href = 'login.html';
+const TECNICO = sessionStorage.getItem('manut_tecnico') || 'Manutenção';
+document.getElementById('tecnicoNome').textContent = TECNICO;
 
 const firebaseConfig = {
   apiKey: "AIzaSyCPiAWJ5q8FqVTqJ8NUgyFYqUtktqMmt94",
@@ -302,8 +303,8 @@ const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
 let allTickets = [];
-let iniciandoId = null;
 let finalizingId = null;
+let cancelandoId = null;
 let mesesActiveMonth = null;
 
 function loadAll() {
@@ -412,9 +413,9 @@ function renderTickets() {
     <td><span class="badge p${x.prioridade}">${prioLabel(x.prioridade)}</span></td>
     <td style="font-size:12px;color:var(--yellow);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataCriacao, null)}</td>
     <td><div class="actions">
-      <button class="btn-action btn-iniciar" onclick="abrirIniciar('${x._docId}','${x.id}','${(x.lider||'').replace(/'/g,"\\'")}','${x.maquina}')">▶ Iniciar</button>
+      <button class="btn-action btn-iniciar" onclick="iniciar('${x._docId}')">▶ Iniciar</button>
       <button class="btn-action btn-ver"     onclick="verDetalhes('${x._docId}')">👁</button>
-      <button class="btn-action btn-del"     onclick="deletarTicket('${x._docId}','${x.id}')">✕</button>
+      <button class="btn-action btn-del"     onclick="pedirCancelamento('${x._docId}','${x.id}')">✕</button>
     </div></td></tr>`).join('');
 }
 window.renderTickets=renderTickets;
@@ -436,9 +437,9 @@ function renderAndamento() {
     <td style="font-size:12px;color:var(--accent);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataInicio, null)}</td>
     <td><span style="font-size:12px;color:var(--yellow);font-family:var(--mono)">${x.tecnicoInicio||'—'}</span></td>
     <td><div class="actions">
-      <button class="btn-action btn-finalizar" onclick="abrirFinalizar('${x._docId}','${x.id}','${(x.lider||'').replace(/'/g,"\\'")}','${x.tecnicoInicio||''}')">✓ Finalizar</button>
+      <button class="btn-action btn-finalizar" onclick="abrirFinalizar('${x._docId}','${x.id}','${(x.lider||'').replace(/'/g,"\\'")}')">✓ Finalizar</button>
       <button class="btn-action btn-ver"       onclick="verDetalhes('${x._docId}')">👁</button>
-      <button class="btn-action btn-del"       onclick="deletarTicket('${x._docId}','${x.id}')">✕</button>
+      <button class="btn-action btn-del"       onclick="pedirCancelamento('${x._docId}','${x.id}')">✕</button>
     </div></td></tr>`).join('');
 }
 window.renderAndamento=renderAndamento;
@@ -450,12 +451,13 @@ function renderHistory() {
   if(search) t=t.filter(x=>x.lider?.toLowerCase().includes(search)||x.maquina?.toLowerCase().includes(search)||x.id?.toLowerCase().includes(search));
   if(mes)    t=t.filter(x=>x.mes===mes);
   const tbody=document.getElementById('histTable');
-  if(!t.length){tbody.innerHTML=`<tr><td colspan="10"><div class="empty-state"><div class="icon">📭</div>Nenhum chamado finalizado</div></td></tr>`;return;}
+  if(!t.length){tbody.innerHTML=`<tr><td colspan="11"><div class="empty-state"><div class="icon">📭</div>Nenhum chamado finalizado</div></td></tr>`;return;}
   tbody.innerHTML=t.map(x=>`<tr>
     <td class="td-id">${x.id}</td>
     <td><div class="td-name">${x.lider}</div><div class="td-sub">${x.setor}</div></td>
     <td><span style="font-size:12px">${x.maquina}</span></td>
     <td><span class="badge p${x.prioridade}">${prioLabel(x.prioridade)}</span></td>
+    <td style="max-width:180px;font-size:12px;color:var(--text2)">${x.solucao||'—'}</td>
     <td><span style="font-size:12px;color:var(--green);font-family:var(--mono)">${x.tecnicoFim||'—'}</span></td>
     <td style="font-size:11px;color:var(--text3);font-family:var(--mono);white-space:nowrap">${fmt(x.dataFim)}</td>
     <td style="font-size:12px;color:var(--yellow);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataCriacao, x.dataInicio)}</td>
@@ -487,8 +489,8 @@ function selectMesAtivo(m){mesesActiveMonth=m;renderMonths();}
 window.selectMesAtivo=selectMesAtivo;
 
 function csvRows(t) {
-  const header=['ID','Lider','Setor','Maquina','Tipo Problema','Observacao','Prioridade','Tecnico Inicio','Tecnico Fim','Data Abertura','Data Inicio','Data Fim','T. Espera','T. Andamento','Mes'];
-  const rows=t.map(x=>[x.id,x.lider,x.setor,x.maquina,x.tipoProblema,'"'+(x.observacao||'').replace(/"/g,'""')+'"',x.prioridade,x.tecnicoInicio||'—',x.tecnicoFim||'—',fmt(x.dataCriacao),fmt(x.dataInicio),fmt(x.dataFim),calcTempo(x.dataCriacao,x.dataInicio),calcTempo(x.dataInicio,x.dataFim),x.mes]);
+  const header=['ID','Lider','Setor','Maquina','Tipo Problema','Observacao','Prioridade','Solucao','Tecnico Inicio','Tecnico Fim','Data Abertura','Data Inicio','Data Fim','T. Espera','T. Andamento','Mes'];
+  const rows=t.map(x=>[x.id,x.lider,x.setor,x.maquina,x.tipoProblema,'"'+(x.observacao||'').replace(/"/g,'""')+'"',x.prioridade,'"'+(x.solucao||'').replace(/"/g,'""')+'"',x.tecnicoInicio||'—',x.tecnicoFim||'—',fmt(x.dataCriacao),fmt(x.dataInicio),fmt(x.dataFim),calcTempo(x.dataCriacao,x.dataInicio),calcTempo(x.dataInicio,x.dataFim),x.mes]);
   return [header,...rows].map(r=>r.join(';')).join('\n');
 }
 
@@ -503,49 +505,20 @@ function downloadMesCSV(){
 }
 window.downloadMesCSV=downloadMesCSV;
 
-async function abrirIniciar(docId,id,lider,maquina){
-  iniciandoId=docId;
-  document.getElementById('modalIniciarSub').textContent=`${id} — ${lider} | ${maquina}`;
-  document.getElementById('tecnicoIniciarSel').value='';
-  document.getElementById('tecnicoIniciarOutro').style.display='none';
-  document.getElementById('tecnicoIniciarOutro').value='';
-  document.getElementById('btnConfirmarIniciar').disabled=false;
-  document.getElementById('btnConfirmarIniciar').textContent='Iniciar';
-  document.getElementById('modalIniciar').classList.add('open');
-}
-window.abrirIniciar=abrirIniciar;
-
-document.getElementById('tecnicoIniciarSel').addEventListener('change', function(){
-  document.getElementById('tecnicoIniciarOutro').style.display = this.value==='Outro' ? 'block' : 'none';
-});
-document.getElementById('tecnicoFinalizarSel').addEventListener('change', function(){
-  document.getElementById('tecnicoFinalizarOutro').style.display = this.value==='Outro' ? 'block' : 'none';
-});
-
-async function confirmarIniciar(){
-  const sel=document.getElementById('tecnicoIniciarSel').value;
-  const tecnico = sel==='Outro' ? document.getElementById('tecnicoIniciarOutro').value.trim() : sel;
-  if(!tecnico){alert('Selecione ou digite o nome do técnico.');return;}
-  const btn=document.getElementById('btnConfirmarIniciar');
-  btn.disabled=true; btn.textContent='Salvando...';
+async function iniciar(docId){
   try {
-    await updateDoc(doc(db,'chamados',iniciandoId),{status:'Em andamento',dataInicio:new Date().toISOString(),tecnicoInicio:tecnico});
-    closeModal('modalIniciar');
-    showToast('▶ Chamado iniciado por '+tecnico+'!');
+    await updateDoc(doc(db,'chamados',docId),{status:'Em andamento',dataInicio:new Date().toISOString(),tecnicoInicio:TECNICO});
+    showToast('▶ Chamado iniciado por '+TECNICO+'!');
   } catch(e){
     showToast('❌ Erro ao iniciar.','error');
-    btn.disabled=false; btn.textContent='Iniciar';
   }
 }
-window.confirmarIniciar=confirmarIniciar;
+window.iniciar=iniciar;
 
-function abrirFinalizar(docId,id,lider,tecnicoInicio){
+function abrirFinalizar(docId,id,lider){
   finalizingId=docId;
   document.getElementById('modalFinalizarSub').textContent=`${id} — ${lider}`;
-  const sel=document.getElementById('tecnicoFinalizarSel');
-  sel.value = [...sel.options].some(o=>o.value===tecnicoInicio) ? tecnicoInicio : '';
-  document.getElementById('tecnicoFinalizarOutro').style.display='none';
-  document.getElementById('tecnicoFinalizarOutro').value='';
+  document.getElementById('solucaoInput').value='';
   document.getElementById('btnConfirmarFinalizar').disabled=false;
   document.getElementById('btnConfirmarFinalizar').textContent='Finalizar';
   document.getElementById('modalFinalizar').classList.add('open');
@@ -553,15 +526,14 @@ function abrirFinalizar(docId,id,lider,tecnicoInicio){
 window.abrirFinalizar=abrirFinalizar;
 
 async function confirmarFinalizar(){
-  const sel=document.getElementById('tecnicoFinalizarSel').value;
-  const tecnico = sel==='Outro' ? document.getElementById('tecnicoFinalizarOutro').value.trim() : sel;
-  if(!tecnico){alert('Selecione ou digite o nome do técnico.');return;}
+  const sol=document.getElementById('solucaoInput').value.trim();
+  if(!sol){alert('Descreva o que foi feito.');return;}
   const btn=document.getElementById('btnConfirmarFinalizar');
   btn.disabled=true; btn.textContent='Salvando...';
   try {
-    await updateDoc(doc(db,'chamados',finalizingId),{status:'Finalizado',dataFim:new Date().toISOString(),tecnicoFim:tecnico});
+    await updateDoc(doc(db,'chamados',finalizingId),{status:'Finalizado',solucao:sol,dataFim:new Date().toISOString(),tecnicoFim:TECNICO});
     closeModal('modalFinalizar');
-    showToast('✅ Chamado finalizado por '+tecnico+'!');
+    showToast('✅ Chamado finalizado por '+TECNICO+'!');
   } catch(e){
     showToast('❌ Erro ao finalizar.','error');
     btn.disabled=false; btn.textContent='Finalizar';
@@ -569,12 +541,39 @@ async function confirmarFinalizar(){
 }
 window.confirmarFinalizar=confirmarFinalizar;
 
-async function deletarTicket(docId,id){
-  if(!confirm('Excluir o chamado '+id+'?')) return;
-  try{await deleteDoc(doc(db,'chamados',docId));showToast('Chamado '+id+' removido.');}
-  catch(e){showToast('Erro ao remover.','error');}
+const SENHA_CANCELAR = 'manutencao@2026';
+
+function pedirCancelamento(docId,id){
+  cancelandoId=docId;
+  document.getElementById('modalCancelarSub').textContent=`Cancelar o chamado ${id}? Essa ação não pode ser desfeita.`;
+  document.getElementById('cancelarSenha').value='';
+  document.getElementById('cancelarErrorMsg').classList.remove('show');
+  document.getElementById('btnConfirmarCancelar').disabled=false;
+  document.getElementById('btnConfirmarCancelar').textContent='Cancelar chamado';
+  document.getElementById('modalCancelar').classList.add('open');
 }
-window.deletarTicket=deletarTicket;
+window.pedirCancelamento=pedirCancelamento;
+
+async function confirmarCancelamento(){
+  const senha=document.getElementById('cancelarSenha').value;
+  const err=document.getElementById('cancelarErrorMsg');
+  if(senha!==SENHA_CANCELAR){
+    err.classList.add('show');
+    setTimeout(()=>err.classList.remove('show'),3000);
+    return;
+  }
+  const btn=document.getElementById('btnConfirmarCancelar');
+  btn.disabled=true; btn.textContent='Cancelando...';
+  try{
+    await deleteDoc(doc(db,'chamados',cancelandoId));
+    closeModal('modalCancelar');
+    showToast('Chamado cancelado.');
+  } catch(e){
+    showToast('Erro ao cancelar.','error');
+    btn.disabled=false; btn.textContent='Cancelar chamado';
+  }
+}
+window.confirmarCancelamento=confirmarCancelamento;
 
 function verDetalhes(docId){
   const t=allTickets.find(x=>x._docId===docId);
@@ -597,12 +596,16 @@ function verDetalhes(docId){
     </div>
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px">
       <div style="font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:.08em;margin-bottom:6px">TIPO DE PROBLEMA</div>
-      <span style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.18);color:var(--accent);border-radius:6px;padding:3px 10px;font-size:12px;font-weight:600">${t.tipoProblema}</span>
+      <span style="background:rgba(197,242,73,0.08);border:1px solid rgba(197,242,73,0.18);color:var(--accent);border-radius:6px;padding:3px 10px;font-size:12px;font-weight:600">${t.tipoProblema}</span>
     </div>
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px">
       <div style="font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:.08em;margin-bottom:8px">📝 OBSERVAÇÃO</div>
       <div style="font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap">${t.observacao}</div>
     </div>
+    ${t.solucao?`<div style="background:rgba(74,222,128,0.05);border:1px solid rgba(74,222,128,0.18);border-radius:10px;padding:14px;margin-bottom:10px">
+      <div style="font-size:10px;color:var(--green);font-family:var(--mono);letter-spacing:.08em;margin-bottom:8px">✅ SOLUÇÃO APLICADA</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap">${t.solucao}</div>
+    </div>`:''}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px">
         <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">ABERTO EM</div>
@@ -658,7 +661,7 @@ function showToast(msg,type=''){
   t._timer=setTimeout(()=>t.classList.remove('show'),3500);
 }
 
-function logout(){sessionStorage.removeItem('manut_logged');window.location.href='login.html';}
+function logout(){sessionStorage.removeItem('manut_logged');sessionStorage.removeItem('manut_tecnico');window.location.href='login.html';}
 window.logout=logout;
 
 loadAll();
