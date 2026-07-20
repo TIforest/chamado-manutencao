@@ -65,7 +65,12 @@
         <option>JOVENIL SILVA</option>
         <option>ARGEU CARVALHO</option>
         <option>PAULO CUNHA</option>
+        <option value="Outros">Outros (não está na lista)</option>
       </select>
+    </div>
+    <div class="field" id="campoOutroNome" style="display:none">
+      <label>Digite seu nome</label>
+      <input type="text" id="liderOutroNome" placeholder="Seu nome completo">
     </div>
     <div class="field">
       <label>Senha</label>
@@ -77,28 +82,53 @@
 <script>
   document.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
 
+  const liderSel = document.getElementById('lider');
+  const campoOutroNome = document.getElementById('campoOutroNome');
+  liderSel.addEventListener('change', () => {
+    campoOutroNome.style.display = liderSel.value === 'Outros' ? 'block' : 'none';
+  });
+
   // ==========================================================
   // SENHAS DOS LÍDERES — mude aqui pra trocar a senha de cada um
+  // Senha = CPF da pessoa, só números (sem ponto/traço)
+  // OBS: ARGEU e PAULO vieram com o mesmo CPF cadastrado (provável
+  // erro de digitação) — PAULO CUNHA ficou com a senha padrão até
+  // o CPF certo dele ser confirmado.
   // ==========================================================
   const USUARIOS = {
-    'FERNANDO BETIM':  '123456',
-    'SAMUEL LIMA':     '123456',
-    'JOVENIL SILVA':   '123456',
-    'ARGEU CARVALHO':  '123456',
+    'FERNANDO BETIM':  '10983128905',
+    'SAMUEL LIMA':     '12818421926',
+    'JOVENIL SILVA':   '05965643926',
+    'ARGEU CARVALHO':  '02143035942',
     'PAULO CUNHA':     '123456'
   };
+
+  // ==========================================================
+  // SENHA PADRÃO PRA QUEM CLICA EM "OUTROS" — mude aqui
+  // ==========================================================
+  const SENHA_OUTROS = '123456';
+
   function login() {
-    const l = document.getElementById('lider').value;
+    const l = liderSel.value;
     const s = document.getElementById('senha').value;
     const err = document.getElementById('errorMsg');
-    if (l && USUARIOS[l] && s === USUARIOS[l]) {
+
+    if (l === 'Outros') {
+      const nome = document.getElementById('liderOutroNome').value.trim().toUpperCase();
+      if (nome && s === SENHA_OUTROS) {
+        sessionStorage.setItem('lider_logged', '1');
+        sessionStorage.setItem('lider_nome', nome);
+        window.location.href = 'index.html';
+        return;
+      }
+    } else if (l && USUARIOS[l] && s === USUARIOS[l]) {
       sessionStorage.setItem('lider_logged', '1');
       sessionStorage.setItem('lider_nome', l);
       window.location.href = 'index.html';
-    } else {
-      err.classList.add('show');
-      setTimeout(() => err.classList.remove('show'), 3000);
+      return;
     }
+    err.classList.add('show');
+    setTimeout(() => err.classList.remove('show'), 3000);
   }
 </script>
 </body>
