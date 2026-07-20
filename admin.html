@@ -161,6 +161,19 @@
     .filter-input { min-width: 0; flex: 1; }
     .modal { padding: 20px; }
   }
+
+  @media (max-width: 700px) {
+    .stats-row { grid-template-columns: 1fr; }
+    .table-wrap table, .table-wrap tbody, .table-wrap tr, .table-wrap td { display: block; width: 100%; }
+    .table-wrap thead { display: none; }
+    .table-wrap tr { border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 12px; background: var(--card); }
+    .table-wrap tr:hover td { background: none; }
+    .table-wrap td { border-bottom: none; padding: 6px 0; }
+    .table-wrap td[data-label]::before { content: attr(data-label); display: block; font-size: 10px; font-family: var(--mono); color: var(--text3); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 3px; }
+    .table-wrap .actions { margin-top: 4px; flex-wrap: wrap; }
+    .btn-action { padding: 9px 14px; font-size: 13px; }
+    .badge { font-size: 12px; padding: 5px 11px; }
+  }
 </style>
 </head>
 <body>
@@ -427,12 +440,12 @@ function renderTickets() {
   const tbody=document.getElementById('ticketsTable');
   if(!t.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="icon">✅</div>Nenhum chamado novo aguardando</div></td></tr>`;return;}
   tbody.innerHTML=t.map(x=>`<tr>
-    <td class="td-id">${x.id}</td>
-    <td><div class="td-name">${fmtNome(x.lider)}</div><div class="td-sub">${x.setor}</div></td>
-    <td><span style="font-size:12px">${x.maquina}</span></td>
-    <td><span style="font-size:11px;color:var(--text2)">${x.tipoProblema}</span><div class="td-sub" style="max-width:200px">${x.observacao||''}</div></td>
-    <td><span class="badge p${x.prioridade}">${prioLabel(x.prioridade)}</span></td>
-    <td style="font-size:12px;color:var(--yellow);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataCriacao, null)}</td>
+    <td class="td-id" data-label="ID">${x.id}</td>
+    <td data-label="Líder / Setor"><div class="td-name">${fmtNome(x.lider)}</div><div class="td-sub">${x.setor}</div></td>
+    <td data-label="Máquina"><span style="font-size:12px">${x.maquina}</span></td>
+    <td data-label="Problema"><span style="font-size:11px;color:var(--text2)">${x.tipoProblema}</span><div class="td-sub" style="max-width:200px">${x.observacao||''}</div></td>
+    <td data-label="Prioridade"><span class="badge p${x.prioridade}">${prioLabel(x.prioridade)}</span></td>
+    <td data-label="Aguardando há" style="font-size:12px;color:var(--yellow);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataCriacao, null)}</td>
     <td><div class="actions">
       <button class="btn-action btn-iniciar" onclick="iniciar('${x._docId}')">▶ Iniciar</button>
       <button class="btn-action btn-ver"     onclick="verDetalhes('${x._docId}')">👁</button>
@@ -450,13 +463,13 @@ function renderAndamento() {
   const tbody=document.getElementById('andamentoTable');
   if(!t.length){tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="icon">📭</div>Nenhum chamado em andamento</div></td></tr>`;return;}
   tbody.innerHTML=t.map(x=>`<tr>
-    <td class="td-id">${x.id}</td>
-    <td><div class="td-name">${fmtNome(x.lider)}</div><div class="td-sub">${x.setor}</div></td>
-    <td><span style="font-size:12px">${x.maquina}</span></td>
-    <td><span class="badge p${x.prioridade}">${prioLabel(x.prioridade)}</span></td>
-    <td style="font-size:12px;color:var(--yellow);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataCriacao, x.dataInicio)}</td>
-    <td style="font-size:12px;color:var(--accent);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataInicio, null)}</td>
-    <td><span style="font-size:12px;color:var(--yellow);font-family:var(--mono)">${fmtNome(x.tecnicoInicio)}</span></td>
+    <td class="td-id" data-label="ID">${x.id}</td>
+    <td data-label="Líder / Setor"><div class="td-name">${fmtNome(x.lider)}</div><div class="td-sub">${x.setor}</div></td>
+    <td data-label="Máquina"><span style="font-size:12px">${x.maquina}</span></td>
+    <td data-label="Prioridade"><span class="badge p${x.prioridade}">${prioLabel(x.prioridade)}</span></td>
+    <td data-label="T. espera" style="font-size:12px;color:var(--yellow);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataCriacao, x.dataInicio)}</td>
+    <td data-label="T. andamento" style="font-size:12px;color:var(--accent);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataInicio, null)}</td>
+    <td data-label="Técnico"><span style="font-size:12px;color:var(--yellow);font-family:var(--mono)">${fmtNome(x.tecnicoInicio)}</span></td>
     <td><div class="actions">
       <button class="btn-action btn-finalizar" onclick="abrirFinalizar('${x._docId}','${x.id}','${(x.lider||'').replace(/'/g,"\\'")}')">✓ Finalizar</button>
       <button class="btn-action btn-ver"       onclick="verDetalhes('${x._docId}')">👁</button>
@@ -474,16 +487,16 @@ function renderHistory() {
   const tbody=document.getElementById('histTable');
   if(!t.length){tbody.innerHTML=`<tr><td colspan="11"><div class="empty-state"><div class="icon">📭</div>Nenhum chamado finalizado</div></td></tr>`;return;}
   tbody.innerHTML=t.map(x=>`<tr>
-    <td class="td-id">${x.id}</td>
-    <td><div class="td-name">${fmtNome(x.lider)}</div><div class="td-sub">${x.setor}</div></td>
-    <td><span style="font-size:12px">${x.maquina}</span></td>
-    <td><span class="badge p${x.prioridade}">${prioLabel(x.prioridade)}</span></td>
-    <td style="max-width:180px;font-size:12px;color:var(--text2)">${x.solucao||'—'}</td>
-    <td><span style="font-size:12px;color:var(--green);font-family:var(--mono)">${fmtNome(x.tecnicoFim)}</span></td>
-    <td style="font-size:11px;color:var(--text3);font-family:var(--mono);white-space:nowrap">${fmt(x.dataFim)}</td>
-    <td style="font-size:12px;color:var(--yellow);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataCriacao, x.dataInicio)}</td>
-    <td style="font-size:12px;color:var(--accent);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataInicio, x.dataFim)}</td>
-    <td><span style="font-family:var(--mono);font-size:11px;color:var(--accent)">${x.mes}</span></td>
+    <td class="td-id" data-label="ID">${x.id}</td>
+    <td data-label="Líder / Setor"><div class="td-name">${fmtNome(x.lider)}</div><div class="td-sub">${x.setor}</div></td>
+    <td data-label="Máquina"><span style="font-size:12px">${x.maquina}</span></td>
+    <td data-label="Prioridade"><span class="badge p${x.prioridade}">${prioLabel(x.prioridade)}</span></td>
+    <td data-label="Solução" style="max-width:180px;font-size:12px;color:var(--text2)">${x.solucao||'—'}</td>
+    <td data-label="Técnico"><span style="font-size:12px;color:var(--green);font-family:var(--mono)">${fmtNome(x.tecnicoFim)}</span></td>
+    <td data-label="Data Fim" style="font-size:11px;color:var(--text3);font-family:var(--mono);white-space:nowrap">${fmt(x.dataFim)}</td>
+    <td data-label="T. espera" style="font-size:12px;color:var(--yellow);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataCriacao, x.dataInicio)}</td>
+    <td data-label="T. andamento" style="font-size:12px;color:var(--accent);font-family:var(--mono);white-space:nowrap">${calcTempo(x.dataInicio, x.dataFim)}</td>
+    <td data-label="Mês"><span style="font-family:var(--mono);font-size:11px;color:var(--accent)">${x.mes}</span></td>
     <td><button class="btn-action btn-ver" onclick="verDetalhes('${x._docId}')" title="Ver chamado original">👁</button></td>
   </tr>`).join('');
 }
