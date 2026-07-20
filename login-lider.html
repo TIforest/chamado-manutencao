@@ -109,6 +109,8 @@
   // ==========================================================
   const SENHA_OUTROS = 'Forest@2026';
 
+  const MSG_ERRO_PADRAO = 'Líder ou senha incorretos.';
+
   function login() {
     const l = liderSel.value;
     const s = document.getElementById('senha').value;
@@ -116,9 +118,16 @@
 
     if (l === 'Outros') {
       const nome = document.getElementById('liderOutroNome').value.trim().toUpperCase();
+      const jaCadastrado = Object.keys(USUARIOS).some(cadastrado => cadastrado.toUpperCase() === nome);
+      if (jaCadastrado) {
+        err.textContent = '⚠️ Esse nome já está cadastrado — selecione ele na lista e entre com a senha dele.';
+        err.classList.add('show');
+        setTimeout(() => err.classList.remove('show'), 4000);
+        return;
+      }
       if (nome && s === SENHA_OUTROS) {
         sessionStorage.setItem('lider_logged', '1');
-        sessionStorage.setItem('lider_nome', nome);
+        sessionStorage.setItem('lider_nome', nome + ' (EXTERNO)');
         window.location.href = 'index.html';
         return;
       }
@@ -128,6 +137,7 @@
       window.location.href = 'index.html';
       return;
     }
+    err.textContent = '⚠️ ' + MSG_ERRO_PADRAO;
     err.classList.add('show');
     setTimeout(() => err.classList.remove('show'), 3000);
   }
